@@ -1,0 +1,35 @@
+/* framebuffer.h */
+
+#ifndef _FRAMEBUFFER_H_
+#define _FRAMEBUFFER_H_
+
+#include <stdint.h>
+
+extern uint16_t* fb;
+
+typedef uint16_t fb_char_t;
+
+typedef enum {
+	FB_BLACK    = 0,
+	FB_BLUE     = 1,
+	FB_GREEN    = 2,
+	FB_CYAN     = 3,
+	FB_RED      = 4,
+	FB_MAGENTA  = 5,
+	FB_BROWN    = 6,
+	FB_LGREY    = 7,
+	FB_DGREY    = 8,
+	FB_LBLUE    = 9,
+	FB_LGREEN   = 10,
+	FB_LCYAN    = 11,
+	FB_LRED     = 12,
+	FB_LMAGENTA = 13,
+	FB_LBROWN   = 14,
+	FB_WHITE    = 15
+} fb_color_t;
+
+inline fb_char_t fb_mkchar(fb_color_t fb_bgcolor, fb_color_t fb_fgcolor, uint8_t ascii) {
+	return ((uint8_t) fb_bgcolor << 12) | ((uint8_t) fb_fgcolor << 8) | ascii;
+}
+
+#endif
