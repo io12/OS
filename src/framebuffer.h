@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
-extern uint16_t* fb;
-
 typedef uint16_t fb_char_t;
+
+extern fb_char_t* fb;
 
 typedef enum {
 	FB_BLACK    = 0,

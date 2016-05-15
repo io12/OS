@@ -1,7 +1,5 @@
 /* kmain.c */
 
-#include <stdint.h>
-
 #include "framebuffer.h"
 
 void kmain() {

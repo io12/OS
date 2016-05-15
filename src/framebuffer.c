@@ -4,4 +4,4 @@
 
 #include "framebuffer.h"
 
-uint16_t* fb = (uint16_t*) 0xB8000;
+fb_char_t* fb = (fb_char_t*) 0xB8000;
