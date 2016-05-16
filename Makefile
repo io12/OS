@@ -3,7 +3,7 @@ CFLAGS = -m32 -nostdlib -ffreestanding -Wall -Wextra -Werror -O3
 
 OBJS = src/arch/i386/boot.o src/kmain.o src/framebuffer.o
 
-.PHONY = all clean bochs qemu
+.PHONY = all clean qemu
 
 all: OS.iso
 
@@ -22,10 +22,7 @@ src/arch/i386/boot.o: src/arch/i386/boot.asm
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf bochslog.txt OS.iso
-
-bochs: OS.iso
-	bochs -q
+	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf OS.iso
 
 qemu: OS.iso
 	qemu-system-i386 -cdrom $^
