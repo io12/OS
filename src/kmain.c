@@ -2,6 +2,8 @@
 
 #include "framebuffer.h"
 
+// This is called as the first function after being loaded by the bootloader.
 void kmain() {
-	fb[0] = fb_mkchar(FB_BLACK, FB_WHITE, '?');
+	// Write a qustion mark to the framebuffer
+	fb_putchar('?');
 }
