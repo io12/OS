@@ -1,7 +1,5 @@
 /* framebuffer.c */
 
-#include <stdint.h>
-
 #include "framebuffer.h"
 
 // Initialize values for the framebuffer struct

@@ -1,5 +1,5 @@
 AS = nasm
-CFLAGS = -m32 -nostdlib -ffreestanding -Wall -Wextra -Werror -O3
+CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -Werror -O3
 
 OBJS = src/arch/i386/boot.o src/kmain.o src/framebuffer.o
 LINKER_SCRIPT = link.ld
