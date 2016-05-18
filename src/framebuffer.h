@@ -55,7 +55,13 @@ inline void fb_puts(const char* str) {
 	size_t length = strlen(str);
 
 	for (i = 0; i < length; i++) {
-		fb_putchar(str[i]);
+		// move to the next line if newline char is found
+		if (str[i] == '\n') {
+			fb.pos = ((fb.pos / 80) + 1) * 80;
+		}
+		else {
+			fb_putchar(str[i]);
+		}
 	}
 }
 
