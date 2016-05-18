@@ -1,7 +1,7 @@
 AS = nasm
-CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -Werror -O3
+CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -Werror -O3 -Isrc/libk
 
-OBJS = src/arch/i386/boot.o src/kmain.o src/framebuffer.o
+OBJS = src/arch/i386/boot.o src/kmain.o src/framebuffer.o src/libk/string/strlen.o
 LINKER_SCRIPT = link.ld
 
 .PHONY = all clean qemu

@@ -3,7 +3,8 @@
 #ifndef _FRAMEBUFFER_H_
 #define _FRAMEBUFFER_H_
 
-#include "libk/ints.h"
+#include <ints.h>
+#include <string.h>
 
 // Characters on the framebuffer are just 16 bit integers
 typedef uint16_t fb_char_t;
@@ -49,8 +50,13 @@ inline void fb_putchar(uint8_t ascii) {
 }
 
 // Write a string to the framebuffer
-/*inline void fb_puts(const char* str) {
-	
-}*/
+inline void fb_puts(const char* str) {
+	size_t i;
+	size_t length = strlen(str);
+
+	for (i = 0; i < length; i++) {
+		fb_putchar(str[i]);
+	}
+}
 
 #endif
