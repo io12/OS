@@ -1,7 +1,12 @@
 AS = nasm
 CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -Werror -O3 -Isrc/libk
 
-OBJS = src/arch/i386/boot.o src/kmain.o src/framebuffer.o src/libk/string/strlen.o
+C_FILES = $(shell find src/ -type f -name "*.c")
+H_FILES = $(shell find src/ -type f -name "*.h")
+ASM_FILES = $(shell find src/ -type f -name "*.asm")
+C_OBJS = $(C_FILES:.c=.o)
+ASM_OBJS = $(ASM_FILES:.asm=.o)
+OBJS = $(C_OBJS) $(ASM_OBJS)
 LINKER_SCRIPT = link.ld
 
 .PHONY = all clean qemu
@@ -16,10 +21,10 @@ OS.iso: kernel.elf
 kernel.elf: $(OBJS) $(LINKER_SCRIPT)
 	ld -T $(LINKER_SCRIPT) -melf_i386 $(OBJS) -o $@
 
-src/arch/i386/boot.o: src/arch/i386/boot.asm
+%.o: %.asm
 	$(AS) $^ -f elf32
 
-%.o: %.c
+%.o: %.c | $(H_FILES)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
