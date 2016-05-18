@@ -13,7 +13,7 @@ LINKER_SCRIPT = link.ld
 
 all: OS.iso
 
-OS.iso: kernel.elf
+OS.iso: kernel.elf $(H_FILES)
 	cp kernel.elf iso/boot/
 	cp kernel.elf iso/efi.img
 	grub-mkrescue iso/ -o $@
@@ -24,7 +24,7 @@ kernel.elf: $(OBJS) $(LINKER_SCRIPT)
 %.o: %.asm
 	$(AS) $^ -f elf32
 
-%.o: %.c | $(H_FILES)
+%.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
