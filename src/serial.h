@@ -7,17 +7,14 @@
 
 #include "ioport.h"
 
+#define COM1 0x3F8
+
 typedef uint16_t serial_com_t;
+typedef uint8_t	serial_data_t;
 
-// Sets the baud rate for a serial port
-inline void serial_set_baud_rate(serial_com_t com, uint16_t div) {
-	io_out(SERIAL_LINE_COMMAND_PORT(com), SERIAL_LINE_ENABLE_DLAB);
-	io_out(SERIAL_DATA_PORT(com), div >> 8);
-	io_out(SERIAL_DATA_PORT(com), div & 0x00FF);
-}
-
-inline void serial_conf_line(serial_com_t com) {
-	io_out(SERIAL_LINE_COMMAND_PORT(com), 0x03);
-}
+void serial_init(serial_com_t com);
+int serial_fifo_isempty(serial_com_t com);
+void serial_putchar(serial_com_t com, serial_data_t data);
+void serial_puts(serial_com_t com, const char* str);
 
 #endif

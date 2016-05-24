@@ -18,7 +18,7 @@ section .bss
 align 4
 ; Allocate space for a stack (required to run C code)
 kernel_stack_bottom:
-resb	4096
+resb	8192
 kernel_stack_top:
 
 section .text

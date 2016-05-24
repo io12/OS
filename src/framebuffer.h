@@ -17,7 +17,7 @@ typedef uint16_t fb_pos_t;
 // Struct to store information about the framebuffer
 typedef struct {
 	// Pointer to the framebuffer
-	fb_char_t* const p; // TODO: see if this can be const
+	fb_char_t* const p;
 	// Current position
 	uint16_t pos;
 } fb_t;
