@@ -31,4 +31,4 @@ clean:
 	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso
 
 qemu: OS.iso
-	qemu-system-i386 -serial file:COM1.out -cdrom $^
+	qemu-system-i386 -serial stdio -cdrom $^
