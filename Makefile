@@ -1,5 +1,5 @@
 AS = nasm
-CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -O3 -Isrc/libk
+CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -O2 -Isrc/libk -g
 
 C_FILES = $(shell find src/ -type f -name "*.c")
 H_FILES = $(shell find src/ -type f -name "*.h")
@@ -28,7 +28,7 @@ kernel.elf: $(OBJS) $(LINKER_SCRIPT)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso
+	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso serial.txt
 
 qemu: OS.iso
-	qemu-system-i386 -serial stdio -cdrom $^
+	qemu-system-i386 -serial file:serial.txt -cdrom $^ -s &
