@@ -30,5 +30,5 @@ kernel.elf: $(OBJS) $(LINKER_SCRIPT)
 clean:
 	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso serial.txt
 
-qemu: OS.iso
-	qemu-system-i386 -serial file:serial.txt -cdrom $^ -s &
+qemu: kernel.elf
+	qemu-system-i386 -serial file:serial.txt -kernel kernel.elf -s &

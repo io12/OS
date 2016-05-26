@@ -25,19 +25,24 @@ int serial_fifo_isempty(serial_com_t com) {
 	return io_in(com + 5) & 0x20;
 }
 
+// Wait to do a serial action
+void serial_wait() {
+	while (serial_fifo_isempty(COM1) == 0) {}
+}
+
 // Write to a serial port
 void serial_putchar(serial_com_t com, serial_data_t data) {
 	// Wait till the buffer is flushed
-	while (serial_fifo_isempty(com) == 0) {}
+	serial_wait();
 	// Write the data
 	io_out(com, data);
 }
 
-void serial_puts(serial_com_t com, const char* str) {
+void serial_puts(const char* str) {
 	size_t i;
 	size_t length = strlen(str);
 
 	for (i = 0; i < length; i++) {
-		serial_putchar(com, str[i]);
+		serial_putchar(COM1, str[i]);
 	}
 }

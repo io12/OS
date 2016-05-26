@@ -14,7 +14,8 @@ typedef uint8_t	serial_data_t;
 
 void serial_init(serial_com_t com);
 int serial_fifo_isempty(serial_com_t com);
+void serial_wait();
 void serial_putchar(serial_com_t com, serial_data_t data);
-void serial_puts(serial_com_t com, const char* str);
+void serial_puts(const char* str);
 
 #endif
