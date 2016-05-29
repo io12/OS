@@ -3,7 +3,7 @@
 ; Define constants for the multiboot header.
 ; MAGIC_NUMBER + FLAGS + CHECKSUM must equal 0 for the header to be valid.
 MAGIC_NUMBER	equ 0x1BADB002
-FLAGS 		equ 0x0
+FLAGS 		equ 11b
 CHECKSUM	equ -(MAGIC_NUMBER + FLAGS)
 
 ; Declare the multiboot header.
@@ -27,6 +27,8 @@ global boot_main
 boot_main:
 ; Set the stack pointer.
 mov	esp, kernel_stack_top
+; Disable interrupts.
+cli
 ; No more assembly is needed to run C code.
 ; Call the C function kmain.
 extern kmain
