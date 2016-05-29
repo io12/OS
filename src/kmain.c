@@ -1,5 +1,7 @@
 /* kmain.c */
 
+#include "sanitycheck.h"
+
 #include <fb.h>
 #include <serial.h>
 
