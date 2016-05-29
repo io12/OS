@@ -1,12 +1,12 @@
-/* framebuffer.c */
+/* fb.c */
 
 #include <ints.h>
 #include <string.h>
 
-#include "ioport.h"
-#include "serial.h"
+#include <ioport.h>
+#include <serial.h>
 
-#include "framebuffer.h"
+#include <fb.h>
 
 fb_t fb;
 

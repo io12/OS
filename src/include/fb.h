@@ -1,7 +1,7 @@
-/* framebuffer.h */
+/* fb.h */
 
-#ifndef _FRAMEBUFFER_H_
-#define _FRAMEBUFFER_H_
+#ifndef _FB_H_
+#define _FB_H_
 
 #include <ints.h>
 #include <defs.h>

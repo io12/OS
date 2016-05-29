@@ -1,7 +1,7 @@
 /* kmain.c */
 
-#include "framebuffer.h"
-#include "serial.h"
+#include <fb.h>
+#include <serial.h>
 
 // This is called as the first function after being loaded by the bootloader.
 void kmain() {
