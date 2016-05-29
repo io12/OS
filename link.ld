@@ -1,6 +1,6 @@
 /* link.ld */
 
-ENTRY(boot_main)
+ENTRY(bmain)
 
 SECTIONS {
 	. = 1M;

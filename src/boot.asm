@@ -23,8 +23,8 @@ kernel_stack_top:
 
 section .text
 ; Entry point
-global boot_main
-boot_main:
+global bmain
+bmain:
 ; Set the stack pointer.
 mov	esp, kernel_stack_top
 ; Disable interrupts.
