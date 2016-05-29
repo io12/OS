@@ -5,6 +5,14 @@
 #ifndef _SANITYCHECK_H_
 #define _SANITYCHECK_H_
 
+#ifndef __GNUC__
+#error "Must use a compiler supporting GNU extensions"
+#endif
+
+#ifndef __ELF__
+#error "Kernel must be compiled as an ELF executable"
+#endif
+
 #ifdef __cplusplus
 #error "Must be compiled with a C compiler"
 #endif
