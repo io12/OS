@@ -4,6 +4,7 @@
 
 #include <framebuffer.h>
 #include <serial.h>
+#include <gdt.h>
 
 // This is called as the first function after being loaded by the bootloader.
 void kmain(){
@@ -11,4 +12,6 @@ void kmain(){
 	fb_init();
 	// Write to the framebuffer
 	fb_puts("Hello world!\n");
+	
+	gdt_init();
 }
