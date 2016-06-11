@@ -1,5 +1,7 @@
 AS = nasm
-CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -Wall -Wextra -O2 -Isrc/libk -Isrc/include -g
+CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding
+CFLAGS += -Wall -Wextra -O2 -g
+CFLAGS += -Isrc/libk/include -Isrc/include
 
 C_FILES = $(shell find src/ -type f -name "*.c")
 H_FILES = $(shell find src/ -type f -name "*.h")
@@ -13,7 +15,7 @@ LINKER_SCRIPT = link.ld
 
 all: OS.iso
 
-OS.iso: kernel.elf $(H_FILES)
+OS.iso: kernel.elf
 	cp kernel.elf iso/boot/
 	cp kernel.elf iso/efi.img
 	grub-mkrescue iso/ -o $@

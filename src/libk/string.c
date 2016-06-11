@@ -1,5 +1,7 @@
 /* strlen.c */
 
+#include <defs.h>
+
 #include <string.h>
 
 // Calculates the length of a string

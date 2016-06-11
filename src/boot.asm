@@ -23,7 +23,7 @@ kernel_stack_top:
 
 section .text
 ; Entry point
-global bmain
+global	bmain
 bmain:
 ; Set the stack pointer.
 mov	esp, kernel_stack_top
@@ -31,16 +31,13 @@ mov	esp, kernel_stack_top
 cli
 ; No more assembly is needed to run C code.
 ; Call the C function kmain.
-extern kmain
+extern	kmain
 call	kmain
 ; kmain is not supposed to return, but all code below acts as a safety net if it does.
 ; Disable interrupts
 cli
-
-.loop:
 ; Halt processor until an interrupt
-; Interrupts were disabled before, so this should halt forever.
 hlt
-; If by some miracle the execution continues, jump back to halt again.
-; Otherwise execution would fly off the edge of the RAM.
-jmp	.loop
+; If by some miracle the execution continues, jump to current line forever.
+; Lots of care is taken to ensure execution doesn't fly off the edge of the RAM.
+jmp	$

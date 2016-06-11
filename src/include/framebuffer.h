@@ -1,12 +1,12 @@
-/* fb.h */
+/* framebuffer.h */
 
-#ifndef _FB_H_
-#define _FB_H_
+#ifndef _FRAMEBUFFER_H_
+#define _FRAMEBUFFER_H_
 
 #include <ints.h>
 #include <defs.h>
 
-#include "ioport.h"
+#include <ioport.h>
 
 #define FB_ROWS 25
 #define FB_COLS 80
@@ -22,18 +22,15 @@
 #define FB_LOW_BYTE_COMMAND		15
 
 // Characters on the framebuffer are just 16 bit integers
-typedef uint16_t fb_char_t;
-
-// Framebuffer position type
-typedef uint16_t fb_pos_t;
+typedef u16 FBcell;
 
 // Struct to store information about the framebuffer
 typedef struct {
 	// Pointer to the framebuffer
-	fb_char_t* p;
+	FBcell* p;
 	// Current position
-	uint16_t pos;
-} fb_t;
+	u16 pos;
+} Framebuffer;
 
 // All the possible framebuffer color values
 typedef enum {
@@ -53,12 +50,12 @@ typedef enum {
 	FB_LMAGENTA = 13,
 	FB_LBROWN   = 14,
 	FB_WHITE    = 15
-} fb_color_t;
+} FBcolor;
 
 void fb_init();
 void fb_mov();
-fb_char_t fb_mkchar(fb_color_t fb_bgcolor, fb_color_t fb_fgcolor, uint8_t ascii);
-void fb_putchar(uint8_t ascii);
+FBcell fb_mkchar(FBcolor bg, FBcolor fg, u8 ascii);
+void fb_putchar(u8 ascii);
 void fb_puts(const char* str);
 void fb_scroll();
 

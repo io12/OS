@@ -1,4 +1,4 @@
-/* fb.c */
+/* framebuffer.c */
 
 #include <ints.h>
 #include <string.h>
@@ -6,16 +6,16 @@
 #include <ioport.h>
 #include <serial.h>
 
-#include <fb.h>
+#include <framebuffer.h>
 
-fb_t fb;
+Framebuffer fb;
 
 // Initialize the framebuffer
 void fb_init() {
-	uint16_t i;
-	fb_char_t blank = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
+	u16 i;
+	FBcell blank = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
 
-	fb.p = (fb_char_t*) 0xB8000;
+	fb.p = (FBcell*) 0xB8000;
 	for (i = 0; i <= FB_LASTCELL; i++) {
 		serial_wait();
 		fb.p[i] = blank;
@@ -33,12 +33,12 @@ void fb_mov() {
 }
 
 // Creates a framebuffer cell based on two colors and an ascii value
-fb_char_t fb_mkchar(fb_color_t fb_bgcolor, fb_color_t fb_fgcolor, uint8_t ascii) {
-	return ((uint8_t) fb_bgcolor << 12) | ((uint8_t) fb_fgcolor << 8) | ascii;
+FBcell fb_mkchar(FBcolor bg, FBcolor fg, u8 ascii) {
+	return ((u8) bg << 12) | ((u8) fg << 8) | ascii;
 }
 
 // Write a character to the framebuffer
-void fb_putchar(uint8_t ascii) {
+void fb_putchar(u8 ascii) {
 	//serial_wait();
 	// move to the next line if character is a newline
 	if (ascii == '\n') {
@@ -70,7 +70,7 @@ void fb_puts(const char* str) {
 
 // Scroll the terminal down
 void fb_scroll() {
-	uint16_t i;
+	u16 i;
 
 	// Copy each row up
 	for (i = FB_COLS; i <= FB_LASTCELL; i++) {

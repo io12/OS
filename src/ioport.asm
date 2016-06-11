@@ -1,7 +1,7 @@
 ; ioport.asm ;
 
 ; This function is just a wrapper around the "out" asm instruction.
-global io_out
+global	io_out
 io_out:
 ; load I/O port address into dx
 mov	dx, [esp + 4]
@@ -12,7 +12,7 @@ out	dx, al
 ret
 
 ; Similar to above, but for "in".
-global io_in
+global	io_in
 io_in:
 mov	dx, [esp + 4]
 in	al, dx

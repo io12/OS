@@ -2,28 +2,43 @@
 
 #include <ints.h>
 
-// GDT descriptor flags
-#define GDT_DESCTYPE(X)
-#define GDT_PRESENT(X)
-#define GDT_SYS_AVAILABLE(X)
-#define GDT_LONG_MODE(X)
-#define GDT_SIZE(X)
-#define GDT_GRANULARITY(X)
-#define GDT_PRIVILEGE(X)
+#include <gdt.h>
 
-// Make a GDT descriptor
-void gdt_mkdesc(uint32_t base, uint32_t limit, uint32_t flag) {
-	uint64_t descriptor = 0;
+typedef struct {
+	u16 limit_low;
+	u16 base_low;
+	u8  base_middle;
+	u8  access;
+	u8  limit_high_and_flags;
+	u8  base_high;
+} __attribute__((packed))
+GDTentry;
 
-	// Create high 32 bit segment
-	descriptor |= limit		& 0x000F0000;
-	descriptor |= (flag << 8)	& 0x00F0FF00;
-	descriptor |= (base >> 16)	& 0x000000FF;
-	descriptor |= base		& 0xFF000000;
+struct {
+	u16 size;
+	GDTentry* offset;
+	GDTentry entries[5];
+} gdt;
 
-	descriptor <<= 32;
+static void gdt_mkentry(u32 index, u32 base, u32 limit, u8 access, u8 flag) {
+	gdt.entries[index].limit_low             = (limit & 0x0000FFFF);
+	gdt.entries[index].base_low              = (base  & 0x0000FFFF);
+	gdt.entries[index].base_middle           = (base  & 0x00FF0000) >> 16;
+	gdt.entries[index].access                = access;
+	gdt.entries[index].limit_high_and_flags  = (limit & 0x000F0000) >> 16;
+	gdt.entries[index].limit_high_and_flags	|= (flag & 0xF0);
+	gdt.entries[index].base_high             = (base  & 0xFF000000) >> 24;
+}
 
-	// Create low segment
-	descriptor |= base << 16;
-	descriptor |= limit		& 0x0000FFFF;
+void gdt_init() {
+	gdt.size = sizeof(gdt.entries) - 1;
+	gdt.offset = gdt.entries;
+
+	gdt_mkentry(0, 0, 0, 0, 0);
+	gdt_mkentry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+	gdt_mkentry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
+	gdt_mkentry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
+	gdt_mkentry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
+
+	lgdt((void*) &gdt);
 }

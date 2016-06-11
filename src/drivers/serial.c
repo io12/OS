@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-#include "serial.h"
+#include <serial.h>
 
-void serial_init(serial_com_t com) {
+void serial_init(u16 com) {
 	// Disable interrupts
 	io_out(com + 1, 0x00);
 	// Enable DLAB
@@ -21,7 +21,7 @@ void serial_init(serial_com_t com) {
 }
 
 // Checks if the fifo is empty
-int serial_fifo_isempty(serial_com_t com) {
+int serial_fifo_isempty(u16 com) {
 	return io_in(com + 5) & 0x20;
 }
 
@@ -31,7 +31,7 @@ void serial_wait() {
 }
 
 // Write to a serial port
-void serial_putchar(serial_com_t com, serial_data_t data) {
+void serial_putchar(u16 com, u8 data) {
 	// Wait till the buffer is flushed
 	serial_wait();
 	// Write the data
