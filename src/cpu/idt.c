@@ -1,47 +1,28 @@
 /* idt.c */
 
 #include <ints.h>
+#include <kprintf.h>
 #include <string.h>
+
+#include <ioport.h>
 
 #include <idt.h>
 
-#define ISR_NAME(X) _isr##X
-#define ISRS        32
+void _isr0();  void _isr1();  void _isr2();  void _isr3();
+void _isr4();  void _isr5();  void _isr6();  void _isr7();
+void _isr8();  void _isr9();  void _isr10(); void _isr11();
+void _isr12(); void _isr13(); void _isr14(); void _isr15();
+void _isr16(); void _isr17(); void _isr18(); void _isr19();
+void _isr20(); void _isr21(); void _isr22(); void _isr23();
+void _isr24(); void _isr25(); void _isr26(); void _isr27();
+void _isr28(); void _isr29(); void _isr30(); void _isr31();
 
-typedef void (*IDTbase)();
+void _irq0();  void _irq1();  void _irq2();  void _irq3();
+void _irq4();  void _irq5();  void _irq6();  void _irq7();
+void _irq8();  void _irq9();  void _irq10(); void _irq11();
+void _irq12(); void _irq13(); void _irq14(); void _irq15();
 
-void _isr0();
-void _isr1();
-void _isr2();
-void _isr3();
-void _isr4();
-void _isr5();
-void _isr6();
-void _isr7();
-void _isr8();
-void _isr9();
-void _isr10();
-void _isr11();
-void _isr12();
-void _isr13();
-void _isr14();
-void _isr15();
-void _isr16();
-void _isr17();
-void _isr18();
-void _isr19();
-void _isr20();
-void _isr21();
-void _isr22();
-void _isr23();
-void _isr24();
-void _isr25();
-void _isr26();
-void _isr27();
-void _isr28();
-void _isr29();
-void _isr30();
-void _isr31();
+void lidt();
 
 struct {
 	u16 base_low;
@@ -53,59 +34,25 @@ struct {
 idt[256];
 
 struct {
-	u16   limit;
-	void* base;
+	u16 limit;
+	u32 base;
 } __attribute__((packed))
-idt_desc;
+idt_ptr;
 
-const char* exception_messages[ISRS] = {
-	"Division by zero",
-	"Debug",
-	"Non-maskable interrupt",
-	"Breakpoint",
-	"Detected overflow",
-	"Out-of-bounds",
-	"Invalid opcode",
-	"No coprocessor",
-	"Double fault",
-	"Coprocessor segment overrun",
-	"Bad TSS",
-	"Segment not present",
-	"Stack fault",
-	"General protection fault",
-	"Page fault",
-	"Unknown interrupt",
-	"Coprocessor fault",
-	"Alignment check",
-	"Machine check",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved"
-};
-
-static void idt_set_gate(u8 num, u32 base, u16 selector, u8 flags) {
-	idt[num].base_low = (base & 0x0000FFFF);
-	idt[num].selector = selector;
-	idt[num].zero     = 0;
-	idt[num].flags    = flags;
-	idt[num].base_low = (base & 0xFFFF0000) >> 16;
+static void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags) {
+	idt[n].base_low = (base & 0x0000FFFF);
+	idt[n].selector = selector;
+	idt[n].zero     = 0;
+	idt[n].flags    = flags | 0x60;
+	idt[n].base_low = (base & 0xFFFF0000) >> 16;
 }
 
 void idt_init() {
-	idt_desc.limit = sizeof(idt) - 1;
-	idt_desc.base  = idt;
-	memset(idt, 0, sizeof(idt));
+	idt_ptr.limit = sizeof(idt) - 1;
+	idt_ptr.base  = (u32) &idt;
+	memset(&idt, 0, sizeof(idt));
 
+	// ISRs
 	idt_set_gate(0,  (u32) _isr0,  0x08, 0x8E);
 	idt_set_gate(1,  (u32) _isr1,  0x08, 0x8E);
 	idt_set_gate(2,  (u32) _isr2,  0x08, 0x8E);
@@ -139,5 +86,33 @@ void idt_init() {
 	idt_set_gate(30, (u32) _isr30, 0x08, 0x8E);
 	idt_set_gate(31, (u32) _isr31, 0x08, 0x8E);
 
-	lidt((void*) &idt_desc);
+	// IRQs
+	io_out(0x20, 0x11);
+	io_out(0xA0, 0x11);
+	io_out(0x21, 0x20);
+	io_out(0xA1, 0x28);
+	io_out(0x21, 0x04);
+	io_out(0xA1, 0x02);
+	io_out(0x21, 0x01);
+	io_out(0xA1, 0x01);
+	io_out(0x21, 0x00);
+	io_out(0xA1, 0x00);
+	idt_set_gate(32, (u32) _irq0,  0x08, 0x8E);
+	idt_set_gate(33, (u32) _irq1,  0x08, 0x8E);
+	idt_set_gate(34, (u32) _irq2,  0x08, 0x8E);
+	idt_set_gate(35, (u32) _irq3,  0x08, 0x8E);
+	idt_set_gate(36, (u32) _irq4,  0x08, 0x8E);
+	idt_set_gate(37, (u32) _irq5,  0x08, 0x8E);
+	idt_set_gate(38, (u32) _irq6,  0x08, 0x8E);
+	idt_set_gate(39, (u32) _irq7,  0x08, 0x8E);
+	idt_set_gate(40, (u32) _irq8,  0x08, 0x8E);
+	idt_set_gate(41, (u32) _irq9,  0x08, 0x8E);
+	idt_set_gate(42, (u32) _irq10, 0x08, 0x8E);
+	idt_set_gate(43, (u32) _irq11, 0x08, 0x8E);
+	idt_set_gate(44, (u32) _irq12, 0x08, 0x8E);
+	idt_set_gate(45, (u32) _irq13, 0x08, 0x8E);
+	idt_set_gate(46, (u32) _irq14, 0x08, 0x8E);
+	idt_set_gate(47, (u32) _irq15, 0x08, 0x8E);
+
+	lidt();
 }

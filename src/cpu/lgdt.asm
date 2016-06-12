@@ -1,11 +1,10 @@
 ; lgdt.asm ;
 
-global lgdt
+global	lgdt
+extern	gdt_ptr
 lgdt:
-; get address of GDT from argument
-mov	eax, [esp + 4]
 ; load the GDT
-lgdt	[eax]
+lgdt	[gdt_ptr]
 ; set the cs register to 0x08
 jmp	0x08:.reload_cs
 .reload_cs:

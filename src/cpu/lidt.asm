@@ -1,7 +1,8 @@
 ; lidt.asm ;
 
-global lidt
+global	lidt
+extern	idt_ptr
 lidt:
-mov	eax, [esp + 4]
-lidt	[eax]
+lidt	[idt_ptr]
+sti
 ret

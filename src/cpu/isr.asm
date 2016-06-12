@@ -1,20 +1,21 @@
 ; isr.asm ;
 
-%macro ISR_ERRCODE 1
-global _isr%1
+section .text
+%macro	ISR_ERRCODE 1
+global	_isr%1
 _isr%1:
 cli
-push byte 0
-push byte %1
-jmp isr_common_stub
+push	byte %1
+jmp	isr_common_stub
 %endmacro
 
-%macro ISR_NOERRCODE 1
-global _isr%1
+%macro	ISR_NOERRCODE 1
+global	_isr%1
 _isr%1:
 cli
-push byte %1
-jmp isr_common_stub
+push	byte 0
+push	byte %1
+jmp	isr_common_stub
 %endmacro
 
 ISR_NOERRCODE 0
@@ -50,8 +51,7 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
-extern isr_handler
-
+extern	isr_handler
 isr_common_stub:
 ; save edi, esi, ebp, esp, ebx, edx, ecx, eax
 pusha

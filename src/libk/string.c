@@ -7,13 +7,13 @@
 
 void* memset(void* s, int c, size_t n) {
 	size_t i;
-	u8* p = s;
+	volatile u8* p = s;
 
 	for (i = 0; i < n; i++) {
 		p[i] = c;
 	}
 
-	return s;
+	return (void*) p;
 }
 
 size_t strlen(const char* str) {

@@ -4,6 +4,5 @@
 #define _IDT_H_
 
 void idt_init();
-void lidt(void* idt);
 
 #endif

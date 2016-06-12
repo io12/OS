@@ -8,7 +8,7 @@
 
 #include <framebuffer.h>
 
-Framebuffer fb;
+volatile Framebuffer fb;
 
 // Initialize the framebuffer
 void fb_init() {
@@ -17,7 +17,6 @@ void fb_init() {
 
 	fb.p = (FBcell*) 0xB8000;
 	for (i = 0; i <= FB_LASTCELL; i++) {
-		serial_wait();
 		fb.p[i] = blank;
 	}
 

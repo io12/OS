@@ -3,15 +3,17 @@
 #include <sanitycheck.h>
 
 #include <framebuffer.h>
-#include <serial.h>
 #include <gdt.h>
+#include <idt.h>
+#include <serial.h>
 
-// This is called as the first function after being loaded by the bootloader.
-void kmain(){
+void timer_init();
+
+// This is called as the first function after being loaded by bmain.
+void kmain() {
 	serial_init(COM1);
 	fb_init();
-	// Write to the framebuffer
-	fb_puts("Hello world!\n");
-	
 	gdt_init();
+	idt_init();
+	timer_init();
 }

@@ -1,6 +1,6 @@
 AS = nasm
-CFLAGS = -m32 -nostdlib -nostdinc -ffreestanding
-CFLAGS += -Wall -Wextra -O2 -g
+CFLAGS = -m32 -ffreestanding -nostdlib -nostdinc
+CFLAGS += -Wall -Wextra -O0 -g
 CFLAGS += -Isrc/libk/include -Isrc/include
 
 C_FILES = $(shell find src/ -type f -name "*.c")
@@ -11,7 +11,7 @@ ASM_OBJS = $(ASM_FILES:.asm=.o)
 OBJS = $(C_OBJS) $(ASM_OBJS)
 LINKER_SCRIPT = link.ld
 
-.PHONY = all clean qemu
+.PHONY = all clean qemu debug
 
 all: OS.iso
 
@@ -32,5 +32,8 @@ kernel.elf: $(OBJS) $(LINKER_SCRIPT)
 clean:
 	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso serial.out
 
-qemu: kernel.elf
-	qemu-system-i386 -serial file:serial.out -kernel kernel.elf -s &
+qemu: OS.iso
+	qemu-system-i386 -serial file:serial.out -cdrom OS.iso &
+
+debug: kernel.elf
+	qemu-system-i386 -serial file:serial.out -kernel kernel.elf -s -S &

@@ -5,10 +5,12 @@
 #ifndef _ARG_H_
 #define _ARG_H_
 
-typedef char* va_list;
+#define va_start(ap, last) __builtin_va_start(ap, last)
+#define va_arg(ap, type)   __builtin_va_arg(ap, type)
+#define va_end(ap)         __builtin_va_end(ap)
 
-#define va_start(ap, last)	(ap = (va_list) &last + sizeof(last))
-#define va_arg(ap, type)	(*(type*)(ap += sizeof(type), ap - sizeof(type)))
-#define va_end(ap)		(ap = (va_list)0)
+typedef __builtin_va_list va_list;
+
+void kvprintf(const char* fmt, va_list ap) __attribute((format (printf, 1, 0)));
 
 #endif
