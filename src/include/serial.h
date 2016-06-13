@@ -12,7 +12,7 @@
 void serial_init(u16 com);
 int serial_fifo_isempty(u16 com);
 void serial_wait();
-void serial_putchar(u16 com, u8 data);
+void serial_putchar(u8 data);
 void serial_puts(const char* str);
 
 #endif

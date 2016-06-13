@@ -1,7 +1,6 @@
 /* idt.c */
 
 #include <ints.h>
-#include <kprintf.h>
 #include <string.h>
 
 #include <ioport.h>
@@ -49,8 +48,8 @@ static void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags) {
 
 void idt_init() {
 	idt_ptr.limit = sizeof(idt) - 1;
-	idt_ptr.base  = (u32) &idt;
-	memset(&idt, 0, sizeof(idt));
+	idt_ptr.base  = (u32) idt;
+	memset(&(idt[0]), 0, sizeof(idt));
 
 	// ISRs
 	idt_set_gate(0,  (u32) _isr0,  0x08, 0x8E);
@@ -87,16 +86,6 @@ void idt_init() {
 	idt_set_gate(31, (u32) _isr31, 0x08, 0x8E);
 
 	// IRQs
-	io_out(0x20, 0x11);
-	io_out(0xA0, 0x11);
-	io_out(0x21, 0x20);
-	io_out(0xA1, 0x28);
-	io_out(0x21, 0x04);
-	io_out(0xA1, 0x02);
-	io_out(0x21, 0x01);
-	io_out(0xA1, 0x01);
-	io_out(0x21, 0x00);
-	io_out(0xA1, 0x00);
 	idt_set_gate(32, (u32) _irq0,  0x08, 0x8E);
 	idt_set_gate(33, (u32) _irq1,  0x08, 0x8E);
 	idt_set_gate(34, (u32) _irq2,  0x08, 0x8E);
@@ -113,6 +102,18 @@ void idt_init() {
 	idt_set_gate(45, (u32) _irq13, 0x08, 0x8E);
 	idt_set_gate(46, (u32) _irq14, 0x08, 0x8E);
 	idt_set_gate(47, (u32) _irq15, 0x08, 0x8E);
+
+	// initialize PIC
+	io_out(0x20, 0x11);
+	io_out(0xA0, 0x11);
+	io_out(0x21, 0x20);
+	io_out(0xA1, 0x28);
+	io_out(0x21, 0x04);
+	io_out(0xA1, 0x02);
+	io_out(0x21, 0x01);
+	io_out(0xA1, 0x01);
+	io_out(0x21, 0x00);
+	io_out(0xA1, 0x00);
 
 	lidt();
 }

@@ -1,50 +1,64 @@
 /* kprintf.c */
 
 #include <arg.h>
+#include <defs.h>
 
 #include <framebuffer.h>
+#include <serial.h>
 
 #include <kprintf.h>
 
 #define INT_BUF_SIZE 10
+#define PUTCHAR(X)   (pl == PL_FRAMEBUFFER ? fb_putchar(X) : serial_putchar(X))
+#define PUTS(X)      (pl == PL_FRAMEBUFFER ? fb_puts(X)    : serial_puts(X))
 
-void kprint_dec(int num) {
-	char buf[INT_BUF_SIZE] = {'\0'};
-	int i;
+void dec_to_str(char* buf, int num) {
+	char backwards_buf[INT_BUF_SIZE] = {0};
+	int i = 0;
+	int j = 0;
 
 	// print '-' and make num positive if negative
 	if (num < 0) {
-		fb_putchar('-');
+		backwards_buf[i] = '-';
+		i++;
 		num *= -1;
 	}
 	// store digits backwards in buffer
-	for (i = 0; num != 0 && i < INT_BUF_SIZE; i++) {
-		buf[i] = (num % 10) + '0';
+	while (num != 0 && i < INT_BUF_SIZE) {
+		backwards_buf[i] = (num % 10) + '0';
 		num /= 10;
+		i++;
 	}
-
-	// print buffer backwards
+	// reverse backwards_buf to get buf
 	for (i = INT_BUF_SIZE - 1; i >= 0; i--) {
-		if (buf[i] != '\0') {
-			fb_putchar(buf[i]);
+		if (backwards_buf[i] != '\0') {
+			buf[j] = backwards_buf[i];
+			j++;
 		}
 	}
+	buf[j] = '\0';
 }
 
-void kprintf(const char* fmt, ...) {
+void kprint_dec(PrintLocation pl, int num) {
+	char buf[INT_BUF_SIZE] = {0};
+	dec_to_str(buf, num);
+	PUTS(buf);
+}
+
+void kprintf(PrintLocation pl, const char* fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	kvprintf(fmt, ap);
+	kvprintf(pl, fmt, ap);
 	va_end(ap);
 }
 
-void kvprintf(const char* fmt, va_list ap) {
+void kvprintf(PrintLocation pl, const char* fmt, va_list ap) {
 	char* s = NULL;
 
 	for (; *fmt != '\0'; fmt++) {
 		if (*fmt != '%') {
-			fb_putchar(*fmt);
+			PUTCHAR(*fmt);
 			continue;
 		}
 		fmt++;
@@ -52,25 +66,25 @@ void kvprintf(const char* fmt, va_list ap) {
 			case 's':
 				s = va_arg(ap, char*);
 				if (s == NULL) {
-					fb_puts("(null)");
+					PUTS("(null)");
 				}
 				else {
-					fb_puts(s);
+					PUTS(s);
 				}
 				break;
 			case 'c':
-				fb_putchar(va_arg(ap, int));
+				PUTCHAR(va_arg(ap, int));
 				break;
 			case 'd':
-				kprint_dec(va_arg(ap, int));
+				kprint_dec(pl, va_arg(ap, int));
 				break;
 			case '%':
-				fb_putchar('%');
+				PUTCHAR('%');
 				break;
 			case '\0':
 				return;
 			default:
-				fb_putchar(*fmt);
+				PUTCHAR(*fmt);
 		}
 	}
 }

@@ -6,8 +6,7 @@
 #include <gdt.h>
 #include <idt.h>
 #include <serial.h>
-
-void timer_init();
+#include <timer.h>
 
 // This is called as the first function after being loaded by bmain.
 void kmain() {
@@ -16,4 +15,7 @@ void kmain() {
 	gdt_init();
 	idt_init();
 	timer_init();
+
+	for (;;) {}
+	// NOTREACHED
 }

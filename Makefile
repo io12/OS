@@ -1,17 +1,18 @@
-AS = nasm
-CFLAGS = -m32 -ffreestanding -nostdlib -nostdinc
-CFLAGS += -Wall -Wextra -O0 -g
-CFLAGS += -Isrc/libk/include -Isrc/include
+AS        = nasm
+CFLAGS    = -m32 -ffreestanding -nostdlib -nostdinc
+CFLAGS   += -Wall -Wextra -O0 -g
+CFLAGS   += -Isrc/libk/include -Isrc/include
 
-C_FILES = $(shell find src/ -type f -name "*.c")
-H_FILES = $(shell find src/ -type f -name "*.h")
+C_FILES   = $(shell find src/ -type f -name "*.c")
+H_FILES   = $(shell find src/ -type f -name "*.h")
 ASM_FILES = $(shell find src/ -type f -name "*.asm")
-C_OBJS = $(C_FILES:.c=.o)
-ASM_OBJS = $(ASM_FILES:.asm=.o)
-OBJS = $(C_OBJS) $(ASM_OBJS)
-LINKER_SCRIPT = link.ld
+# ensure kmain is the first function (for debugging)
+C_OBJS    = src/kmain.o $(filter-out src/kmain.o,$(C_FILES:.c=.o))
+ASM_OBJS  = $(ASM_FILES:.asm=.o)
+OBJS      = $(C_OBJS) $(ASM_OBJS)
+LINKER    = link.ld
 
-.PHONY = all clean qemu debug
+.PHONY: all clean qemu debug
 
 all: OS.iso
 
@@ -20,8 +21,8 @@ OS.iso: kernel.elf
 	cp kernel.elf iso/efi.img
 	grub-mkrescue iso/ -o $@
 
-kernel.elf: $(OBJS) $(LINKER_SCRIPT)
-	ld -T $(LINKER_SCRIPT) -melf_i386 $(OBJS) -o $@
+kernel.elf: $(OBJS) $(LINKER)
+	ld -T $(LINKER) -melf_i386 $(OBJS) -o $@
 
 %.o: %.asm
 	$(AS) $^ -f elf32

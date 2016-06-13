@@ -10,12 +10,19 @@
 
 volatile Framebuffer fb;
 
-// Initialize the framebuffer
+u8 fb_getx() {
+	return fb.pos / FB_ROWS;
+}
+
+u8 fb_gety() {
+	return fb.pos / FB_COLS;
+}
+
 void fb_init() {
 	u16 i;
-	FBcell blank = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
+	u16 blank = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
 
-	fb.p = (FBcell*) 0xB8000;
+	fb.p = (u16*) 0xB8000;
 	for (i = 0; i <= FB_LASTCELL; i++) {
 		fb.p[i] = blank;
 	}
@@ -32,7 +39,7 @@ void fb_mov() {
 }
 
 // Creates a framebuffer cell based on two colors and an ascii value
-FBcell fb_mkchar(FBcolor bg, FBcolor fg, u8 ascii) {
+u16 fb_mkchar(FBcolor bg, FBcolor fg, u8 ascii) {
 	return ((u8) bg << 12) | ((u8) fg << 8) | ascii;
 }
 
@@ -57,7 +64,6 @@ void fb_putchar(u8 ascii) {
 	}
 }
 
-// Write a string to the framebuffer
 void fb_puts(const char* str) {
 	size_t i;
 	size_t length = strlen(str);
@@ -67,7 +73,10 @@ void fb_puts(const char* str) {
 	}
 }
 
-// Scroll the terminal down
+void fb_setpos(u8 x, u8 y) {
+	fb.pos = x * y;
+}
+
 void fb_scroll() {
 	u16 i;
 

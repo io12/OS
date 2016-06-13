@@ -31,11 +31,11 @@ void serial_wait() {
 }
 
 // Write to a serial port
-void serial_putchar(u16 com, u8 data) {
+void serial_putchar(u8 data) {
 	// Wait till the buffer is flushed
 	serial_wait();
 	// Write the data
-	io_out(com, data);
+	io_out(COM1, data);
 }
 
 void serial_puts(const char* str) {
@@ -43,6 +43,6 @@ void serial_puts(const char* str) {
 	size_t length = strlen(str);
 
 	for (i = 0; i < length; i++) {
-		serial_putchar(COM1, str[i]);
+		serial_putchar(str[i]);
 	}
 }

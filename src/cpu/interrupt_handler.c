@@ -4,6 +4,7 @@
 #include <ints.h>
 
 #include <framebuffer.h>
+#include <ioport.h>
 
 #include <interrupt_handler.h>
 

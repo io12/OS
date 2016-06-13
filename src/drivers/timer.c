@@ -1,27 +1,33 @@
 /* timer.c */
 
+#include <ints.h>
 #include <kprintf.h>
 
 #include <interrupt_handler.h>
 #include <ioport.h>
 
-int timer_ticks = 0;
+void timer_routine();
 
-void timer_handler(InterruptSave is) {
-	timer_ticks++;
-	if (timer_ticks % 18 == 0) {
-		kprintf("TIMER: %d\n", timer_ticks / 18);
-	}
-}
+int timer = 0;
 
 void timer_init() {
-	irq_new_routine(0, timer_handler);
-}
+	irq_new_routine(0, timer_routine);
 
-void timer_phase(int hz) {
-	int div = 1193180 / hz;
+	// mask IRQ
+	u16 port  = 0x21;
+	u8  value = io_in(0x21) | (1 << 0);
+	io_out(port, value);
+
+	i32 div = 1193180 / 100;
 
 	io_out(0x43, 0x36);
-	io_out(0x40, div & 0xFF);
-	io_out(0x40, div >> 8);
+	io_out(0x40, (div & 0xFF));
+	io_out(0x40, (div >> 8));
+}
+
+void timer_routine() {
+	timer++;
+	if (timer % 100 == 0) {
+		kprintf(PL_SERIAL, "Timer: %d\n", timer / 100);
+	}
 }

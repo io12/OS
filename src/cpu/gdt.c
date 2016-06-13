@@ -4,6 +4,8 @@
 
 #include <gdt.h>
 
+void lgdt();
+
 struct {
 	u16 limit_low;
 	u16 base_low;
@@ -15,8 +17,8 @@ struct {
 gdt[5];
 
 struct {
-	u16   limit;
-	void* base;
+	u16 limit;
+	u32 base;
 } __attribute__((packed))
 gdt_ptr;
 
@@ -32,7 +34,7 @@ static void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag) {
 
 void gdt_init() {
 	gdt_ptr.limit = sizeof(gdt) - 1;
-	gdt_ptr.base  = gdt;
+	gdt_ptr.base  = (u32) &gdt;
 
 	gdt_set_gate(0, 0, 0, 0, 0);
 	gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
@@ -40,5 +42,5 @@ void gdt_init() {
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
 	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
-	lgdt((void*) &gdt_ptr);
+	lgdt();
 }
