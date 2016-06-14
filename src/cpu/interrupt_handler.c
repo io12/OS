@@ -2,8 +2,8 @@
 
 #include <defs.h>
 #include <ints.h>
+#include <kprintf.h>
 
-#include <framebuffer.h>
 #include <ioport.h>
 
 #include <interrupt_handler.h>
@@ -51,8 +51,7 @@ IRQroutine irq_routines[16];
 
 void isr_handler(InterruptSave is) {
 	if (is.int_num < ISR_COUNT) {
-		fb_puts(exception_messages[is.int_num]);
-		fb_puts(" exception\n");
+		kprintf(PL_FRAMEBUFFER, "%s exception\n", exception_messages[is.int_num]);
 		for (;;) {}
 	}
 }
@@ -60,8 +59,9 @@ void isr_handler(InterruptSave is) {
 void irq_handler(InterruptSave is) {
 	IRQroutine routine = irq_routines[is.int_num - 32];
 
-	fb_puts("IRQ interrupt\n");
+	kprintf(PL_FRAMEBUFFER, "IRQ interrupt %d\n", is.int_num);
 	if (routine != NULL) {
+		kprintf(PL_FRAMEBUFFER, "Running routine\n");
 		routine(is);
 	}
 	if (is.int_num >= 40) {

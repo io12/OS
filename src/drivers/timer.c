@@ -6,7 +6,7 @@
 #include <interrupt_handler.h>
 #include <ioport.h>
 
-void timer_routine();
+void timer_routine(InterruptSave is);
 
 int timer = 0;
 
@@ -25,7 +25,7 @@ void timer_init() {
 	io_out(0x40, (div >> 8));
 }
 
-void timer_routine() {
+void timer_routine(InterruptSave is) {
 	timer++;
 	if (timer % 100 == 0) {
 		kprintf(PL_SERIAL, "Timer: %d\n", timer / 100);

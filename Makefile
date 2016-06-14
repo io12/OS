@@ -1,40 +1,45 @@
 AS        = nasm
+ASFLAGS   = -f elf32
 CFLAGS    = -m32 -ffreestanding -nostdlib -nostdinc
 CFLAGS   += -Wall -Wextra -O0 -g
 CFLAGS   += -Isrc/libk/include -Isrc/include
 
+ISO       = OS.iso
+KERNEL    = kernel.elf
 C_FILES   = $(shell find src/ -type f -name "*.c")
 H_FILES   = $(shell find src/ -type f -name "*.h")
 ASM_FILES = $(shell find src/ -type f -name "*.asm")
-# ensure kmain is the first function (for debugging)
-C_OBJS    = src/kmain.o $(filter-out src/kmain.o,$(C_FILES:.c=.o))
+C_OBJS    = $(C_FILES:.c=.o)
 ASM_OBJS  = $(ASM_FILES:.asm=.o)
 OBJS      = $(C_OBJS) $(ASM_OBJS)
 LINKER    = link.ld
 
 .PHONY: all clean qemu debug
 
-all: OS.iso
+all: $(ISO)
 
-OS.iso: kernel.elf
-	cp kernel.elf iso/boot/
-	cp kernel.elf iso/efi.img
+$(ISO): $(KERNEL)
+	cp $(KERNEL) iso/boot/
+	cp $(KERNEL) iso/efi.img
 	grub-mkrescue iso/ -o $@
 
-kernel.elf: $(OBJS) $(LINKER)
+$(KERNEL): $(OBJS) $(LINKER)
 	ld -T $(LINKER) -melf_i386 $(OBJS) -o $@
 
 %.o: %.asm
-	$(AS) $^ -f elf32
+	$(AS) $(ASFLAGS) $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -f $(OBJS) kernel.elf iso/boot/kernel.elf iso/efi.img OS.iso serial.out
+	rm -f $(OBJS) $(KERNEL) iso/boot/$(KERNEL) iso/efi.img $(ISO) serial.out
 
-qemu: OS.iso
-	qemu-system-i386 -serial file:serial.out -cdrom OS.iso &
+qemu: $(ISO)
+	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) &
 
-debug: kernel.elf
-	qemu-system-i386 -serial file:serial.out -kernel kernel.elf -s -S &
+bochs: $(ISO)
+	bochs -f bochsrc.txt -q
+
+debug: $(KERNEL)
+	qemu-system-i386 -serial file:serial.out -kernel $(KERNEL) -s -S &

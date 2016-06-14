@@ -2,6 +2,7 @@
 
 #include <arg.h>
 #include <defs.h>
+#include <ints.h>
 
 #include <framebuffer.h>
 #include <serial.h>
@@ -12,16 +13,16 @@
 #define PUTCHAR(X)   (pl == PL_FRAMEBUFFER ? fb_putchar(X) : serial_putchar(X))
 #define PUTS(X)      (pl == PL_FRAMEBUFFER ? fb_puts(X)    : serial_puts(X))
 
-void dec_to_str(char* buf, int num) {
+void uint_to_str(char* buf, u32 num) {
 	char backwards_buf[INT_BUF_SIZE] = {0};
 	int i = 0;
 	int j = 0;
 
-	// print '-' and make num positive if negative
-	if (num < 0) {
-		backwards_buf[i] = '-';
-		i++;
-		num *= -1;
+	// if number is zero, return early
+	if (num == 0) {
+		buf[0] = '0';
+		buf[1] = '\0';
+		return;
 	}
 	// store digits backwards in buffer
 	while (num != 0 && i < INT_BUF_SIZE) {
@@ -39,9 +40,9 @@ void dec_to_str(char* buf, int num) {
 	buf[j] = '\0';
 }
 
-void kprint_dec(PrintLocation pl, int num) {
+void kprint_uint(PrintLocation pl, u32 num) {
 	char buf[INT_BUF_SIZE] = {0};
-	dec_to_str(buf, num);
+	uint_to_str(buf, num);
 	PUTS(buf);
 }
 
@@ -75,8 +76,8 @@ void kvprintf(PrintLocation pl, const char* fmt, va_list ap) {
 			case 'c':
 				PUTCHAR(va_arg(ap, int));
 				break;
-			case 'd':
-				kprint_dec(pl, va_arg(ap, int));
+			case 'u':
+				kprint_uint(pl, va_arg(ap, u32));
 				break;
 			case '%':
 				PUTCHAR('%');
