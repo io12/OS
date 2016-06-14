@@ -4,6 +4,7 @@
 
 #include <gdt.h>
 
+void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag);
 void gdt_load(u32 gdt_ptr);
 
 struct {
@@ -22,16 +23,6 @@ struct {
 } __attribute__((packed))
 gdt_ptr;
 
-static void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag) {
-	gdt[n].limit_low             = (limit & 0x0000FFFF);
-	gdt[n].base_low              = (base  & 0x0000FFFF);
-	gdt[n].base_middle           = (base  & 0x00FF0000) >> 16;
-	gdt[n].access                = access;
-	gdt[n].limit_high_and_flags  = (limit & 0x000F0000) >> 16;
-	gdt[n].limit_high_and_flags |= (flag & 0xF0);
-	gdt[n].base_high             = (base  & 0xFF000000) >> 24;
-}
-
 void gdt_init() {
 	gdt_ptr.limit = sizeof(gdt) - 1;
 	gdt_ptr.base  = (u32) &gdt;
@@ -47,4 +38,14 @@ void gdt_init() {
 	}*/
 
 	gdt_load((u32) &gdt_ptr);
+}
+
+void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag) {
+	gdt[n].limit_low             = (limit & 0x0000FFFF);
+	gdt[n].base_low              = (base  & 0x0000FFFF);
+	gdt[n].base_middle           = (base  & 0x00FF0000) >> 16;
+	gdt[n].access                = access;
+	gdt[n].limit_high_and_flags  = (limit & 0x000F0000) >> 16;
+	gdt[n].limit_high_and_flags |= (flag & 0xF0);
+	gdt[n].base_high             = (base  & 0xFF000000) >> 24;
 }
