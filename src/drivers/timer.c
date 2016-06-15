@@ -6,28 +6,27 @@
 #include <interrupt_handler.h>
 #include <ioport.h>
 
-void timer_routine(InterruptSave is);
+void timer_callback();
 
 int timer = 0;
 
 void timer_init() {
-	irq_new_routine(0, timer_routine);
+	// A divisor needs to be sent to the PIT that divides it's internal
+	// frequency to get a desired frequency.
+	// This divisor results in the frequency being 100.
+	u16 div = 1193182 / 100;
 
-	// mask IRQ
-	u16 port  = 0x21;
-	u8  value = io_in(0x21) | (1 << 0);
-	io_out(port, value);
-
-	i32 div = 1193180 / 100;
+	irq_new_routine(0, timer_callback);
 
 	io_out(0x43, 0x36);
 	io_out(0x40, (div & 0xFF));
 	io_out(0x40, (div >> 8));
 }
 
-void timer_routine(InterruptSave is) {
+void timer_callback() {
 	timer++;
 	if (timer % 100 == 0) {
-		kprintf(PL_SERIAL, "Timer: %d\n", timer / 100);
+		// runs every second
+		kprintf(PL_FRAMEBUFFER, "%u\n", timer / 100);
 	}
 }

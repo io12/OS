@@ -23,6 +23,7 @@ void _irq8();  void _irq9();  void _irq10(); void _irq11();
 void _irq12(); void _irq13(); void _irq14(); void _irq15();
 
 void idt_load(u32 idt_ptr);
+void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags);
 
 struct {
 	u16 base_low;
@@ -38,14 +39,6 @@ struct {
 	u32 base;
 } __attribute__((packed))
 idt_ptr;
-
-static void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags) {
-	idt[n].base_low  = (base & 0x0000FFFF);
-	idt[n].selector  = selector;
-	idt[n].zero      = 0;
-	idt[n].flags     = flags | 0x60;
-	idt[n].base_high = (base & 0xFFFF0000) >> 16;
-}
 
 void idt_init() {
 	idt_ptr.limit = sizeof(idt) - 1;
@@ -117,4 +110,12 @@ void idt_init() {
 	idt_set_gate(47, (u32) _irq15, 0x08, 0x8E);
 
 	idt_load((u32) &idt_ptr);
+}
+
+void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags) {
+	idt[n].base_low  = (base & 0x0000FFFF);
+	idt[n].selector  = selector;
+	idt[n].zero      = 0;
+	idt[n].flags     = flags | 0x60;
+	idt[n].base_high = (base & 0xFFFF0000) >> 16;
 }
