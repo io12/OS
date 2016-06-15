@@ -17,16 +17,18 @@ dd	CHECKSUM
 section .bss
 align 4
 ; Allocate space for a stack (required to run C code)
-KSTACK_SIZE	equ 8192
-kernel_stack:
-resb	KSTACK_SIZE
+kernel_stack_top:
+resb	8192
+kernel_stack_bottom:
 
 section .text
 ; Entry point
 global	bmain
 bmain:
+; bochs magic breakpoint
+xchg	bx, bx
 ; Set the stack pointer.
-mov	esp, kernel_stack + KSTACK_SIZE
+mov	esp, kernel_stack_bottom
 ; Disable interrupts.
 cli
 ; No more assembly is needed to run C code.

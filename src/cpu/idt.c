@@ -40,11 +40,11 @@ struct {
 idt_ptr;
 
 static void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags) {
-	idt[n].base_low = (base & 0x0000FFFF);
-	idt[n].selector = selector;
-	idt[n].zero     = 0;
-	idt[n].flags    = flags | 0x60;
-	idt[n].base_low = (base & 0xFFFF0000) >> 16;
+	idt[n].base_low  = (base & 0x0000FFFF);
+	idt[n].selector  = selector;
+	idt[n].zero      = 0;
+	idt[n].flags     = flags | 0x60;
+	idt[n].base_high = (base & 0xFFFF0000) >> 16;
 }
 
 void idt_init() {
