@@ -10,8 +10,10 @@ typedef enum {
 	PL_SERIAL
 } PrintLocation;
 
-void uint_to_str(char* buf, u32 num);
-void kprint_uint(PrintLocation pl, u32 num);
+void udec_to_str(char* buf, u32 num);
+void uhex_to_str(char* buf, u32 num);
+void kprint_udec(PrintLocation pl, u32 num);
+void kprint_uhex(PrintLocation pl, u32 num);
 void kprintf(PrintLocation pl, const char* fmt, ...)
 	__attribute__((format (printf, 2, 3)));
 

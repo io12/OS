@@ -1,7 +1,7 @@
 /* timer.c */
 
 #include <ints.h>
-#include <kprintf.h>
+//#include <kprintf.h>
 
 #include <interrupt_handler.h>
 #include <ioport.h>
@@ -9,6 +9,14 @@
 void timer_callback();
 
 int timer = 0;
+
+void timer_callback() {
+	timer++;
+	if (timer % 100 == 0) {
+		// runs every second
+		//kprintf(PL_FRAMEBUFFER, "%u\n", timer / 100);
+	}
+}
 
 void timer_init() {
 	// A divisor needs to be sent to the PIT that divides it's internal
@@ -21,12 +29,4 @@ void timer_init() {
 	io_out(0x43, 0x36);
 	io_out(0x40, (div & 0xFF));
 	io_out(0x40, (div >> 8));
-}
-
-void timer_callback() {
-	timer++;
-	if (timer % 100 == 0) {
-		// runs every second
-		kprintf(PL_FRAMEBUFFER, "%u\n", timer / 100);
-	}
 }

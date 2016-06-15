@@ -27,16 +27,19 @@ global	bmain
 bmain:
 ; bochs magic breakpoint
 xchg	bx, bx
-; Set the stack pointer.
+; set the stack pointer
 mov	esp, kernel_stack_bottom
-; Disable interrupts.
+; disable interrupts before interrupt handling is in place
 cli
-; No more assembly is needed to run C code.
-; Call the C function kmain.
+; push multiboot header pointer
+push	ebx
+; push multiboot header magic
+push	eax
+; call the C function kmain
 extern	kmain
 call	kmain
 ; kmain is not supposed to return, but all code below acts as a safety net if it does.
-; Disable interrupts
+; disable interrupts
 cli
 ; Halt processor until an interrupt
 hlt
