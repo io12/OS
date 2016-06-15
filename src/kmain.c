@@ -6,12 +6,8 @@
 #include <kprintf.h>
 
 #include <framebuffer.h>
-#include <gdt.h>
-#include <idt.h>
-#include <keyboard.h>
 #include <multiboot.h>
-#include <serial.h>
-#include <timer.h>
+#include <system.h>
 
 // This is called as the first function after being loaded by bmain.
 void kmain(u32 mboot_magic/*, MultibootHeader* mboot_header*/) {

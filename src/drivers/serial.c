@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include <serial.h>
+#include <system.h>
 
 void serial_init(u16 com) {
 	// Disable interrupts

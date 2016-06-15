@@ -2,7 +2,7 @@
 
 #include <ints.h>
 
-#include <gdt.h>
+#include <system.h>
 
 void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag);
 void gdt_load(u32 gdt_ptr);
@@ -32,10 +32,6 @@ void gdt_init() {
 	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
 	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
-
-	/*for (int i = 0; i < 5; i++) {
-		kprintf(PL_SERIAL, "gdt[%u]:\n limit_low: %u\n base_low: %u\n base_middle: %u\n access: %u\n limit_high_and_flags: %u\n base_high: %u\n", i, gdt[i].limit_low, gdt[i].base_low, gdt[i].base_middle, gdt[i].access, gdt[i].limit_high_and_flags, gdt[i].base_high);
-	}*/
 
 	gdt_load((u32) &gdt_ptr);
 }

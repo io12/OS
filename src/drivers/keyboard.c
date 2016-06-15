@@ -4,9 +4,8 @@
 
 #include <framebuffer.h>
 #include <interrupt_handler.h>
-#include <ioport.h>
 
-#include <keyboard.h>
+#include <system.h>
 
 void keyboard_callback();
 

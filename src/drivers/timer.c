@@ -4,7 +4,8 @@
 //#include <kprintf.h>
 
 #include <interrupt_handler.h>
-#include <ioport.h>
+
+#include <system.h>
 
 void timer_callback();
 

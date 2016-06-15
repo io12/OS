@@ -5,7 +5,7 @@
 #include <ints.h>
 
 #include <framebuffer.h>
-#include <serial.h>
+#include <system.h>
 
 #include <kprintf.h>
 

@@ -4,9 +4,7 @@
 #include <kprintf.h>
 #include <string.h>
 
-#include <ioport.h>
-
-#include <idt.h>
+#include <system.h>
 
 void _isr0();  void _isr1();  void _isr2();  void _isr3();
 void _isr4();  void _isr5();  void _isr6();  void _isr7();

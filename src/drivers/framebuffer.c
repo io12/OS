@@ -3,12 +3,28 @@
 #include <ints.h>
 #include <string.h>
 
-#include <ioport.h>
-#include <serial.h>
+#include <system.h>
 
 #include <framebuffer.h>
 
-volatile Framebuffer fb;
+#define FB_ROWS      25
+#define FB_COLS      80
+#define FB_BOTTOMROW (FB_COLS * (FB_ROWS - 1))
+#define FB_FIRSTCELL 0
+#define FB_LASTCELL  (FB_COLS * FB_ROWS - 1)
+
+#define FB_COMMAND_PORT 0x3D4
+#define FB_DATA_PORT    0x3D5
+
+#define FB_HIGH_BYTE_COMMAND 14
+#define FB_LOW_BYTE_COMMAND  15
+
+volatile struct {
+	// Pointer to the framebuffer
+	u16* p;
+	// Current position
+	u16  pos;
+} fb;
 
 u8 fb_getx() {
 	return fb.pos / FB_ROWS;
@@ -23,11 +39,11 @@ void fb_init() {
 	u16 blank = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
 
 	fb.p = (u16*) 0xB8000;
-	for (i = 0; i <= FB_LASTCELL; i++) {
+	for (i = FB_FIRSTCELL; i <= FB_LASTCELL; i++) {
 		fb.p[i] = blank;
 	}
 
-	fb.pos = 0;
+	fb.pos = FB_FIRSTCELL;
 }
 
 // Move cursor to a new position
@@ -57,7 +73,17 @@ void fb_putchar(u8 ascii) {
 			fb_mov();
 		}
 	}
+	else if (ascii == '\b') {
+		if (fb.pos > FB_FIRSTCELL) {
+			fb.pos--;
+			fb_mov();
+			fb.p[fb.pos] = fb_mkchar(FB_BLACK, FB_WHITE, ' ');
+		}
+	}
 	else {
+		if (fb.pos == FB_LASTCELL) {
+			fb_scroll();
+		}
 		fb.p[fb.pos] = fb_mkchar(FB_BLACK, FB_WHITE, ascii);
 		fb.pos++;
 		fb_mov();
