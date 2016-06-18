@@ -1,6 +1,6 @@
 /* serial.c */
 
-#include <string.h>
+#include <klibc.h>
 
 #include <system.h>
 

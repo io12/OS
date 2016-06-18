@@ -4,8 +4,8 @@
 
 #include <system.h>
 
-void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag);
 void gdt_load(u32 gdt_ptr);
+void gdt_set_gate(u32 n, u32 base, u32 limit, u8 access, u8 flag);
 
 struct {
 	u16 limit_low;

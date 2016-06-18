@@ -1,10 +1,8 @@
 /* kprintf.c */
 
-#include <arg.h>
-#include <defs.h>
-#include <ints.h>
-
 #include <framebuffer.h>
+#include <ints.h>
+#include <klibc.h>
 #include <system.h>
 
 #include <kprintf.h>

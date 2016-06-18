@@ -27,7 +27,7 @@ __extension__
 typedef unsigned long long int	uint64_t;
 #endif
 
-// shorthand definitions
+// shorthand Rust-like definitions
 typedef int8_t			i8;
 typedef int16_t			i16;
 typedef int32_t			i32;

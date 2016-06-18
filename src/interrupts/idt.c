@@ -1,8 +1,8 @@
 /* idt.c */
 
 #include <ints.h>
+#include <klibc.h>
 #include <kprintf.h>
-#include <string.h>
 
 #include <system.h>
 

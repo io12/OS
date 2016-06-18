@@ -1,9 +1,8 @@
 /* timer.c */
 
+#include <interrupt_handler.h>
 #include <ints.h>
 //#include <kprintf.h>
-
-#include <interrupt_handler.h>
 
 #include <system.h>
 

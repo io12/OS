@@ -1,9 +1,8 @@
 /* interrupt_handler.c */
 
-#include <defs.h>
 #include <ints.h>
+#include <klibc.h>
 #include <kprintf.h>
-
 #include <system.h>
 
 #include <interrupt_handler.h>

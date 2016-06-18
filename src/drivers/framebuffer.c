@@ -1,8 +1,7 @@
 /* framebuffer.c */
 
 #include <ints.h>
-#include <string.h>
-
+#include <klibc.h>
 #include <system.h>
 
 #include <framebuffer.h>

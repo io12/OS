@@ -33,7 +33,8 @@ $(KERNEL): $(OBJS) $(LINKER)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -f $(OBJS) $(KERNEL) iso/boot/$(KERNEL) iso/efi.img $(ISO) serial.out
+	rm -f $(OBJS) $(KERNEL) iso/boot/$(KERNEL) iso/efi.img $(ISO)
+	rm -f serial.out bochslog.txt bx_enh_dbg.ini
 
 qemu: $(ISO)
 	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) &

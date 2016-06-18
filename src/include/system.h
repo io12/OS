@@ -11,7 +11,7 @@ void gdt_init();
 // interrupts/idt.c
 void idt_init();
 
-// ioport.asm
+// drivers/ioport.asm
 void io_out(u16 port, u8 data);
 u8 io_in(u16 port);
 
@@ -29,5 +29,10 @@ void serial_puts(const char* str);
 
 // drivers/timer.c
 void timer_init();
+
+// memory/kalloc.c
+void* kalloc();
+void kfree(void* ptr);
+void memory_init(u32 mem_size);
 
 #endif

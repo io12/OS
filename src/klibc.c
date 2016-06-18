@@ -1,9 +1,8 @@
-/* strlen.c */
+/* klibc.c */
 
-#include <defs.h>
 #include <ints.h>
 
-#include <string.h>
+#include <klibc.h>
 
 void* memset(void* s, int c, size_t n) {
 	size_t i;
