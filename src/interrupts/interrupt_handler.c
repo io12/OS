@@ -50,8 +50,23 @@ IRQroutine irq_routines[16] = {NULL};
 
 void isr_handler(InterruptSave is) {
 	if (is.int_num < ISR_COUNT) {
-		kprintf(PL_FRAMEBUFFER, "%s exception\nHALTING",
-				exception_messages[is.int_num]);
+		kprintf(PL_FRAMEBUFFER,
+				"%s exception\n"
+				"PANIC\n"
+				"interrupt number: %X\n"
+				"error code: %X\n"
+				"\n"
+				"eax=%X ebx=%X ecx=%X edx=%X\n"
+				"esp=%X ebp=%X esi=%X edi=%X\n"
+				"cs=%X ds=%X ss=%X es=%X fs=%X gs=%X\n"
+				"eip=%X\n",
+				exception_messages[is.int_num],
+				is.int_num,
+				is.err,
+				is.eax, is.ebx, is.ecx, is.edx,
+				is.esp, is.ebp, is.esi, is.edi,
+				is.cs, is.ds, is.ss, is.es, is.fs, is.gs,
+				is.eip);
 		__asm__("cli");
 		for (;;) {
 			__asm__("hlt");

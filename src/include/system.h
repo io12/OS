@@ -30,9 +30,14 @@ void serial_puts(const char* str);
 // drivers/timer.c
 void timer_init();
 
-// memory/kalloc.c
-void* kalloc();
-void kfree(void* ptr);
-void memory_init(u32 mem_size);
+// memory/mmap.c
+void* kalloc(u8 aligned, u32 size);
+void* kalloc_frame();
+void mmap_init(u32 size);
+void mmap_set_free(u32 address);
+void mmap_set_used(u32 address);
+
+// memory/paging.c
+void paging_init();
 
 #endif

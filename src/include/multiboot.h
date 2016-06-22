@@ -19,22 +19,25 @@
 #define MULTIBOOT_FLAG_APM     0x200
 #define MULTIBOOT_FLAG_VBE     0x400
 
+#define MULTIBOOT_MEMORY_AVAILABLE 1
+#define MULTIBOOT_MEMORY_RESERVED  2
+
 typedef struct {
 	u32 flags;
-	u32 mem_lower;
+	u32 mem_lower; // in KB
 	u32 mem_upper;
 	u32 boot_device;
 	u32 cmdline;
 	u32 mods_count;
-	u32 mods_addr;
+	u32 mods_address;
 	u32 num;
 	u32 size;
-	u32 addr;
+	u32 address;
 	u32 shndx;
 	u32 mmap_length;
-	u32 mmap_addr;
+	u32 mmap_address;
 	u32 drives_length;
-	u32 drives_addr;
+	u32 drives_address;
 	u32 config_table;
 	u32 boot_loader_name;
 	u32 apm_table;
@@ -45,6 +48,14 @@ typedef struct {
 	u32 vbe_interface_off;
 	u32 vbe_interface_len;
 } __attribute__((packed))
-MultibootHeader;
+MultibootInfo;
+
+typedef struct {
+	u32 size;
+	u64 base_address;
+	u64 length;
+	u32 type;
+} __attribute__((packed))
+MultibootMemoryMap;
 
 #endif
