@@ -22,7 +22,7 @@ all: $(ISO)
 $(ISO): $(KERNEL) $(RAMDISK)
 	cp $(KERNEL) cdrom/boot/
 	cp $(KERNEL) cdrom/efi.img
-	grub-mkrescue cdrom/ -o $@
+	grub-mkrescue --output=$@ cdrom/
 
 $(KERNEL): $(OBJS) $(LINKER)
 	ld -T $(LINKER) -melf_i386 $(OBJS) -o $@
