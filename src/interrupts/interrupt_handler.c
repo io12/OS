@@ -53,13 +53,13 @@ void isr_handler(InterruptSave is) {
 		kprintf(PL_FRAMEBUFFER,
 				"%s exception\n"
 				"PANIC\n"
-				"interrupt number: %X\n"
-				"error code: %X\n"
+				"interrupt number: 0x%X\n"
+				"error code: 0x%X\n"
 				"\n"
-				"eax=%X ebx=%X ecx=%X edx=%X\n"
-				"esp=%X ebp=%X esi=%X edi=%X\n"
-				"cs=%X ds=%X ss=%X es=%X fs=%X gs=%X\n"
-				"eip=%X\n",
+				"eax=0x%X ebx=0x%X ecx=0x%X edx=0x%X\n"
+				"esp=0x%X ebp=0x%X esi=0x%X edi=0x%X\n"
+				"cs=0x%X ds=0x%X ss=0x%X es=0x%X fs=0x%X gs=0x%X\n"
+				"eip=0x%X\n",
 				exception_messages[is.int_num],
 				is.int_num,
 				is.err,

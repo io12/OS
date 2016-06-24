@@ -1,11 +1,12 @@
 AS        = nasm
 ASFLAGS   = -f elf32
 CFLAGS    = -m32 -ffreestanding -nostdlib -nostdinc
-CFLAGS   += -Wall -Wextra -O3 -g
+CFLAGS   += -Wall -Wextra -O0 -g
 CFLAGS   += -Isrc/libk/include -Isrc/include
 
 ISO       = OS.iso
 KERNEL    = kernel.elf
+RAMDISK   = cdrom/rootfs.img
 C_FILES   = $(shell find src/ -type f -name "*.c")
 H_FILES   = $(shell find src/ -type f -name "*.h")
 ASM_FILES = $(shell find src/ -type f -name "*.asm")
@@ -18,13 +19,16 @@ LINKER    = link.ld
 
 all: $(ISO)
 
-$(ISO): $(KERNEL)
-	cp $(KERNEL) iso/boot/
-	cp $(KERNEL) iso/efi.img
-	grub-mkrescue iso/ -o $@
+$(ISO): $(KERNEL) $(RAMDISK)
+	cp $(KERNEL) cdrom/boot/
+	cp $(KERNEL) cdrom/efi.img
+	grub-mkrescue cdrom/ -o $@
 
 $(KERNEL): $(OBJS) $(LINKER)
 	ld -T $(LINKER) -melf_i386 $(OBJS) -o $@
+
+$(RAMDISK): rootfs/ rootfs/*
+	genext2fs -d rootfs/ -U -b 100 -N 100 $@
 
 %.o: %.asm
 	$(AS) $(ASFLAGS) $^
@@ -33,8 +37,10 @@ $(KERNEL): $(OBJS) $(LINKER)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-	rm -f $(OBJS) $(KERNEL) iso/boot/$(KERNEL) iso/efi.img $(ISO)
-	rm -f serial.out bochslog.txt bx_enh_dbg.ini
+	rm -f $(OBJS) $(KERNEL) \
+		cdrom/boot/$(KERNEL) cdrom/efi.img $(ISO) \
+		serial.out bochslog.txt bx_enh_dbg.ini \
+		$(RAMDISK)
 
 qemu: $(ISO)
 	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) &
@@ -42,5 +48,5 @@ qemu: $(ISO)
 bochs: $(ISO)
 	bochs -f bochsrc.txt -q
 
-debug: $(KERNEL)
-	qemu-system-i386 -serial file:serial.out -kernel $(KERNEL) -s -S &
+debug: $(ISO)
+	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) -s -S &

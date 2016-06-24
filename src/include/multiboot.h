@@ -58,4 +58,12 @@ typedef struct {
 } __attribute__((packed))
 MultibootMemoryMap;
 
+typedef struct {
+	u32 mod_start;
+	u32 mod_end;
+	u32 cmdline;
+	u32 reserved;
+} __attribute__((packed))
+MultibootModules;
+
 #endif

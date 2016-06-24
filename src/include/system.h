@@ -40,4 +40,7 @@ void mmap_set_used(u32 address);
 // memory/paging.c
 void paging_init();
 
+// drivers/ext2.c
+void ext2_init(u32 ramdisk_address);
+
 #endif

@@ -9,8 +9,6 @@ global	cr0_write
 cr0_write:
 mov	eax, [esp + 4]
 mov	cr0, eax
-jmp	.jump
-.jump:
 ret
 
 global	cr3_read

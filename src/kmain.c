@@ -17,8 +17,9 @@
 	} while (0)
 
 // This is called as the first function after being loaded by bmain.
-void kmain(u32 mboot_magic, MultibootInfo* mboot_header) {
-	MultibootMemoryMap* mmap = (void*) mboot_header->mmap_address;
+void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
+	MultibootMemoryMap* mmap  = (void*) mboot_info->mmap_address;
+	MultibootModules* modules = (void*) mboot_info->mods_address;
 	u32 i;
 
 	fb_init();
@@ -38,8 +39,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_header) {
 	timer_init();
 	keyboard_init();
 
-	mmap_init(mboot_header->mem_lower + mboot_header->mem_upper);
-	while ((u32) mmap < mboot_header->mmap_address + mboot_header->mmap_length) {
+	mmap_init(mboot_info->mem_lower + mboot_info->mem_upper);
+	while ((u32) mmap < mboot_info->mmap_address + mboot_info->mmap_length) {
 		if (mmap->type == MULTIBOOT_MEMORY_RESERVED) {
 			for (i = 0; i < mmap->length; i += 0x1000) {
 				if (mmap->base_address + i > 0xFFFFFFFF) {
@@ -66,6 +67,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_header) {
 	}
 
 	paging_init();
+
+	ext2_init(modules->mod_start);
 
 	__asm__("sti");
 
