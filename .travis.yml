@@ -8,6 +8,7 @@ before_install:
         - sudo apt-get install clang
         - sudo apt-get install nasm
         - sudo apt-get install grub
+        - sudo apt-get install xorriso
         - sudo apt-get install genext2fs
 script:
         - make
