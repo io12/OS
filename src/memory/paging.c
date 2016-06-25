@@ -7,11 +7,6 @@
 
 #define PAGE_SIZE 0x1000
 
-u32 cr0_read();
-void cr0_write(u32 cr0);
-u32 cr3_read();
-void cr3_write(u32 cr3);
-
 typedef volatile struct {
 	u32 present       : 1;
 	u32 writable      : 1;

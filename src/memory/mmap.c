@@ -13,6 +13,8 @@
 #define FREE 0x0
 #define USED 0x1
 
+void* kalloc(u32 size);
+
 extern u32 kernel_end;
 u32 placement_address = (u32) &kernel_end;
 
@@ -21,13 +23,8 @@ u32 total_memory; // in KB
 u32* frame_table;
 
 // not to be used after mmap_init_finalize
-void* kalloc(u8 aligned, u32 size) {
+void* kalloc(u32 size) {
 	void* ret;
-
-	if (aligned == true) {
-		placement_address &= 0xFFFFF000;
-		placement_address += 0x1000;
-	}
 
 	ret = (void*) placement_address;
 	placement_address += size;
@@ -74,11 +71,17 @@ void* kalloc_frames(u32 num) {
 
 void mmap_init(u32 size) {
 	total_memory = size;
-	frame_table = kalloc(false, FRAME_TABLE_SIZE);
+	frame_table = kalloc(FRAME_TABLE_SIZE);
 }
 
 void mmap_init_finalize() {
-	memset(frame_table, 0xFF, (placement_address / FRAME_SIZE) / 8);
+	// TODO: make this more efficient
+	//memset(frame_table, 0xFF, (placement_address / FRAME_SIZE) / 8);
+	u32 i;
+
+	for (i = 0; i < placement_address; i++) {
+		mmap_set_used(i);
+	}
 }
 
 void mmap_set_free(u32 address) {

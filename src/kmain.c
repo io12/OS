@@ -33,23 +33,23 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 		HALT();
 	}
 
+	kprintf(PL_SERIAL, "Initializing serial ports\n");
 	serial_init(COM1);
+
+	kprintf(PL_SERIAL, "Initializing the GDT\n");
 	gdt_init();
+
+	kprintf(PL_SERIAL, "Initializing the IDT\n");
 	idt_init();
-	timer_init();
+
+	kprintf(PL_SERIAL, "Initializing the keyboard driver\n");
 	keyboard_init();
 
+	kprintf(PL_SERIAL, "Initializing the memory map\n");
 	mmap_init(mboot_info->mem_lower + mboot_info->mem_upper);
+	// copy bootloader's memory map to a bit array
 	while ((u32) mmap < mboot_info->mmap_address + mboot_info->mmap_length) {
-		if (mmap->type == MULTIBOOT_MEMORY_RESERVED) {
-			for (i = 0; i < mmap->length; i += 0x1000) {
-				if (mmap->base_address + i > 0xFFFFFFFF) {
-					break;
-				}
-				mmap_set_used((mmap->base_address + i) & 0xFFFFF000);
-			}
-		}
-		else if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
+		if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
 			for (i = 0; i < mmap->length; i += 0x1000) {
 				if (mmap->base_address + i > 0xFFFFFFFF) {
 					break;
@@ -58,17 +58,26 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 			}
 		}
 		else {
-			kprintf(PL_FRAMEBUFFER,
-					"Invalid memory map containing type %u\n"
-					"HALTING", mmap->type);
-			HALT();
+			for (i = 0; i < mmap->length; i += 0x1000) {
+				if (mmap->base_address + i > 0xFFFFFFFF) {
+					break;
+				}
+				mmap_set_used((mmap->base_address + i) & 0xFFFFF000);
+			}
 		}
 		mmap = (MultibootMemoryMap*) ((u32) mmap + mmap->size + sizeof(u32));
 	}
+	kprintf(PL_SERIAL, "Finalizing the memory map\n");
+	mmap_init_finalize();
 
+	kprintf(PL_SERIAL, "Initializing paging\n");
 	paging_init();
 
+	kprintf(PL_SERIAL, "Initializing ext2 driver\n");
 	ext2_init(modules->mod_start);
+
+	kprintf(PL_SERIAL, "Initializing the process scheduler\n");
+	scheduler_init();
 
 	__asm__("sti");
 

@@ -27,20 +27,27 @@ void serial_wait();
 void serial_putchar(u8 data);
 void serial_puts(const char* str);
 
-// drivers/timer.c
-void timer_init();
-
 // memory/mmap.c
-void* kalloc(u8 aligned, u32 size);
 void* kalloc_frame();
+void* kalloc_frames(u32 num);
 void mmap_init(u32 size);
+void mmap_init_finalize();
 void mmap_set_free(u32 address);
 void mmap_set_used(u32 address);
+
+// memory/control_registers.asm
+u32 cr0_read();
+void cr0_write(u32 cr0);
+u32 cr3_read();
+void cr3_write(u32 cr3);
 
 // memory/paging.c
 void paging_init();
 
 // drivers/ext2.c
 void ext2_init(u32 ramdisk_address);
+
+// scheduler.c
+void scheduler_init();
 
 #endif

@@ -46,7 +46,7 @@ qemu: $(ISO)
 	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) &
 
 bochs: $(ISO)
-	bochs -f bochsrc.txt -q
+	bochs -f bochsrc.txt -q &
 
 debug: $(ISO)
 	qemu-system-i386 -serial file:serial.out -cdrom $(ISO) -s -S &

@@ -145,5 +145,4 @@ void ext2_init(u32 ramdisk_address) {
 	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
 	root_dir = ((void*) root_dir) + root_dir->rec_len;
 	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
-	kprintf(PL_FRAMEBUFFER, "%s\n", ext2_block_to_ptr(ext2_get_inode(root_dir->inode_num)->block[0]));
 }

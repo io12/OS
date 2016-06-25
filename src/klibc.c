@@ -4,15 +4,27 @@
 
 #include <klibc.h>
 
-void* memset(void* s, int c, size_t n) {
+void* memcpy(void* dest, const void* src, size_t n) {
 	size_t i;
-	volatile u8* p = s;
+	u8* dest_ptr = dest;
+	const u8* src_ptr = src;
 
 	for (i = 0; i < n; i++) {
-		p[i] = c;
+		dest_ptr[i] = src_ptr[i];
 	}
 
-	return (void*) p;
+	return dest;
+}
+
+void* memset(void* s, int c, size_t n) {
+	size_t i;
+	u8* ptr = s;
+
+	for (i = 0; i < n; i++) {
+		ptr[i] = c;
+	}
+
+	return (void*) ptr;
 }
 
 size_t strlen(const char* str) {
