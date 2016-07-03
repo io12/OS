@@ -1,6 +1,7 @@
 /* ext2.c */
 
 #include <ints.h>
+#include <klibc.h>
 #include <kprintf.h>
 
 #include <system.h>
@@ -86,13 +87,13 @@ typedef struct {
 
 	u8  name[];
 } __attribute__((packed))
-Ext2DirectoryEntry;
+Ext2DirEntry;
 
-void* ext2_block_to_ptr(u32 block);
 Ext2Inode* ext2_get_inode(u32 inode_num);
 
 Ext2Superblock* ext2_sb;
 Ext2BlockGroupDescriptor* ext2_bgd_table;
+Ext2Inode* ext2_root_inode;
 
 u32 ext2_base_address;
 u32 ext2_block_group_count;
@@ -135,14 +136,29 @@ void ext2_init(u32 ramdisk_address) {
 		ext2_bgd_table = (void*) (ramdisk_address + ext2_block_size);
 	}
 
-	// TODO:
-	Ext2Inode* root = ext2_get_inode(2);
-	Ext2DirectoryEntry* root_dir = ext2_block_to_ptr(root->block[0]);
-	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
-	root_dir = ((void*) root_dir) + root_dir->rec_len;
-	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
-	root_dir = ((void*) root_dir) + root_dir->rec_len;
-	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
-	root_dir = ((void*) root_dir) + root_dir->rec_len;
-	kprintf(PL_FRAMEBUFFER, "%s\n", root_dir->name);
+	ext2_root_inode = ext2_get_inode(2);
+}
+
+u32 ext2_path_to_inode_num(char* pathname) {
+	char* slash_ptr;
+	Ext2DirEntry* direntry_ptr = ext2_block_to_ptr(ext2_root_inode->block[0]);
+	u32 i = 0;
+
+	pathname++;
+	slash_ptr = strchr(pathname, '/');
+	if (slash_ptr != NULL) {
+		*slash_ptr = '\0';
+	}
+
+	while (i < ext2_block_size) {
+		if (strcmp(pathname, (char*) direntry_ptr->name) == 0) {
+			return direntry_ptr->inode_num;
+		}
+
+		i += direntry_ptr->rec_len;
+		direntry_ptr = (((void*) direntry_ptr) + direntry_ptr->rec_len);
+	}
+
+	// FILE DOES NOT EXIST
+	return 0;
 }

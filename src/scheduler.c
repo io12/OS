@@ -26,9 +26,9 @@ void scheduler_init() {
 	irq_new_routine(0, process_switch_callback);
 
 	// initialize PIT
-	io_out(0x43, 0x36);
-	io_out(0x40, (div & 0xFF));
-	io_out(0x40, (div >> 8));
+	out(0x43, 0x36);
+	out(0x40, (div & 0xFF));
+	out(0x40, (div >> 8));
 
 	// TODO: fix this with 245+ processes
 	// intialize process queue

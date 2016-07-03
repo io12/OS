@@ -71,12 +71,14 @@ void uhex_to_str(char* buf, u32 num) {
 
 void kprint_udec(PrintLocation pl, u32 num) {
 	char buf[DEC_BUF_SIZE];
+
 	udec_to_str(buf, num);
 	PUTS(buf);
 }
 
 void kprint_uhex(PrintLocation pl, u32 num) {
 	char buf[HEX_BUF_SIZE];
+
 	uhex_to_str(buf, num);
 	PUTS(buf);
 }

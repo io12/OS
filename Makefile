@@ -1,7 +1,7 @@
 AS        = nasm
 ASFLAGS   = -f elf32
 CFLAGS    = -m32 -ffreestanding -nostdlib -nostdinc
-CFLAGS   += -Wall -Wextra -O0 -g
+CFLAGS   += -Wall -Wextra -std=gnu99 -O3 -g
 CFLAGS   += -Isrc/libk/include -Isrc/include
 
 ISO       = OS.iso

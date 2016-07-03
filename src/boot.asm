@@ -23,7 +23,7 @@ kernel_stack_bottom:
 
 section .text
 ; Entry point
-global	bmain
+global bmain
 bmain:
 ; bochs magic breakpoint
 xchg	bx, bx
@@ -36,7 +36,7 @@ push	ebx
 ; push multiboot header magic
 push	eax
 ; call the C function kmain
-extern	kmain
+extern kmain
 call	kmain
 ; kmain is not supposed to return, but all code below acts as a safety net if it does.
 ; disable interrupts

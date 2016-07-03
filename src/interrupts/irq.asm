@@ -1,7 +1,7 @@
 ; irq.asm ;
 
-%macro	IRQ 2
-global	_irq%1
+%macro IRQ 2
+global _irq%1
 _irq%1:
 cli
 push	byte 0
@@ -26,7 +26,6 @@ IRQ 13, 45
 IRQ 14, 46
 IRQ 15, 47
 
-extern	irq_handler
 irq_common_stub:
 pusha
 push	ds
@@ -38,6 +37,7 @@ mov	ds, ax
 mov	es, ax
 mov	fs, ax
 mov	gs, ax
+extern irq_handler
 mov	eax, irq_handler
 call	eax
 pop	gs

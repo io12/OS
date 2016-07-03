@@ -5,16 +5,11 @@
 #include <framebuffer.h>
 #include <ints.h>
 #include <kprintf.h>
+#include <liballoc.h>
 #include <multiboot.h>
 #include <system.h>
 
-#define HALT() \
-	do { \
-		__asm__("cli"); \
-		for (;;) { \
-			__asm__("hlt"); \
-		} \
-	} while (0)
+#include <klibc.h>
 
 // This is called as the first function after being loaded by bmain.
 void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
@@ -30,10 +25,10 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 				"Not booted with a multiboot compatible bootloader\n"
 				"HALTING",
 				mboot_magic);
-		HALT();
+		permahalt();
+		// NOTREACHED
 	}
 
-	kprintf(PL_SERIAL, "Initializing serial ports\n");
 	serial_init(COM1);
 
 	kprintf(PL_SERIAL, "Initializing the GDT\n");
@@ -54,7 +49,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 				if (mmap->base_address + i > 0xFFFFFFFF) {
 					break;
 				}
-				mmap_set_free((mmap->base_address + i) & 0xFFFFF000);
+				mmap_address_set_free((mmap->base_address + i) &
+						0xFFFFF000);
 			}
 		}
 		else {
@@ -62,7 +58,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 				if (mmap->base_address + i > 0xFFFFFFFF) {
 					break;
 				}
-				mmap_set_used((mmap->base_address + i) & 0xFFFFF000);
+				mmap_address_set_used((mmap->base_address + i) &
+						0xFFFFF000);
 			}
 		}
 		mmap = (MultibootMemoryMap*) ((u32) mmap + mmap->size + sizeof(u32));
@@ -70,8 +67,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	kprintf(PL_SERIAL, "Finalizing the memory map\n");
 	mmap_init_finalize();
 
-	kprintf(PL_SERIAL, "Initializing paging\n");
-	paging_init();
+	//kprintf(PL_SERIAL, "Initializing paging\n");
+	//paging_init();
 
 	kprintf(PL_SERIAL, "Initializing ext2 driver\n");
 	ext2_init(modules->mod_start);
@@ -79,10 +76,8 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	kprintf(PL_SERIAL, "Initializing the process scheduler\n");
 	scheduler_init();
 
-	__asm__("sti");
+	kprintf(PL_FRAMEBUFFER, "%X\n", ext2_path_to_inode_num("/dir/"));
 
-	for (;;) {
-		__asm__("hlt");
-	}
+	permahalt();
 	// NOTREACHED
 }

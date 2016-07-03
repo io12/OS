@@ -44,7 +44,7 @@ u8 qwerty_keymap[128] =
 
 void keyboard_callback() {
 	// get scancode from keyboard's data buffer
-	u8 scancode = io_in(0x60);
+	u8 scancode = in(0x60);
 
 	// check the top bit
 	if ((scancode & 0x80) != 0x00) {

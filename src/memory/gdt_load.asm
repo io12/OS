@@ -1,6 +1,6 @@
 ; gdt_load.asm ;
 
-global	gdt_load
+global gdt_load
 gdt_load:
 ; load the GDT
 mov	eax, [esp + 4]

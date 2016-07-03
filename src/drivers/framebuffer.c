@@ -47,10 +47,10 @@ void fb_init() {
 
 // Move cursor to a new position
 void fb_mov() {
-	io_out(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);
-	io_out(FB_DATA_PORT, fb.pos >> 8);
-	io_out(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
-	io_out(FB_DATA_PORT, fb.pos & 0x00FF);
+	out(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);
+	out(FB_DATA_PORT, fb.pos >> 8);
+	out(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
+	out(FB_DATA_PORT, fb.pos & 0x00FF);
 }
 
 // Creates a framebuffer cell based on two colors and an ascii value

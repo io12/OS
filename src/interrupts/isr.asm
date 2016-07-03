@@ -1,15 +1,15 @@
 ; isr.asm ;
 
-%macro	ISR_ERRCODE 1
-global	_isr%1
+%macro ISR_ERRCODE 1
+global _isr%1
 _isr%1:
 cli
 push	byte %1
 jmp	isr_common_stub
 %endmacro
 
-%macro	ISR_NOERRCODE 1
-global	_isr%1
+%macro ISR_NOERRCODE 1
+global _isr%1
 _isr%1:
 cli
 push	byte 0
@@ -50,7 +50,6 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
-extern	isr_handler
 isr_common_stub:
 ; save edi, esi, ebp, esp, ebx, edx, ecx, eax
 pusha
@@ -66,6 +65,7 @@ mov	es, ax
 mov	fs, ax
 mov	gs, ax
 ; call a C function that handles the exception
+extern isr_handler
 mov	eax, isr_handler
 call	eax
 ; restore segment descriptors

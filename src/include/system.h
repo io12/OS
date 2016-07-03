@@ -11,9 +11,13 @@ void gdt_init();
 // interrupts/idt.c
 void idt_init();
 
-// drivers/ioport.asm
-void io_out(u16 port, u8 data);
-u8 io_in(u16 port);
+// asm_misc.asm
+void cli();
+void sti();
+void hlt();
+void permahalt();
+void out(u16 port, u8 data);
+u8 in(u16 port);
 
 // drivers/keyboard.c
 void keyboard_init();
@@ -30,10 +34,14 @@ void serial_puts(const char* str);
 // memory/mmap.c
 void* kalloc_frame();
 void* kalloc_frames(u32 num);
+u8 mmap_check(u32 n);
 void mmap_init(u32 size);
 void mmap_init_finalize();
-void mmap_set_free(u32 address);
-void mmap_set_used(u32 address);
+void mmap_address_set_free(u32 address);
+void mmap_address_set_used(u32 address);
+u8 mmap_index_check(u32 n);
+void mmap_index_set_free(u32 n);
+void mmap_index_set_used(u32 n);
 
 // memory/control_registers.asm
 u32 cr0_read();
@@ -45,7 +53,9 @@ void cr3_write(u32 cr3);
 void paging_init();
 
 // drivers/ext2.c
+void* ext2_block_to_ptr(u32 block);
 void ext2_init(u32 ramdisk_address);
+u32 ext2_path_to_inode_num(char* pathname);
 
 // scheduler.c
 void scheduler_init();

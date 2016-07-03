@@ -67,10 +67,8 @@ void isr_handler(InterruptSave is) {
 				is.esp, is.ebp, is.esi, is.edi,
 				is.cs, is.ds, is.ss, is.es, is.fs, is.gs,
 				is.eip);
-		__asm__("cli");
-		for (;;) {
-			__asm__("hlt");
-		}
+		permahalt();
+		// NOTREACHED
 	}
 }
 
@@ -82,9 +80,9 @@ void irq_handler(InterruptSave is) {
 		kprintf(PL_SERIAL, "Callback is registered. Running.\n");
 		routine(is);
 	}
-	io_out(0x20, 0x20);
+	out(0x20, 0x20);
 	if (is.int_num >= 40) {
-		io_out(0xA0, 0x20);
+		out(0xA0, 0x20);
 	}
 }
 

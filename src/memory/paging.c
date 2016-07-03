@@ -45,6 +45,9 @@ typedef struct {
 	PageDirectoryEntry entries[1024];
 } PageDirectory;
 
+PageDirectory* kernel_page_directory;
+PageDirectory* user_page_directory;
+
 /*u8 paging_alloc(PageTableEntry* page) {
 	u32 address = (u32) kalloc_frame();
 	if (address == 0) {
@@ -60,7 +63,7 @@ typedef struct {
 /*void paging_free(Page* page) {
 	u32 address = page->frame << 12;
 	if (address != 0) {
-		mmap_set_free(address);
+		mmap_address_set_free(address);
 	}
 
 	page->present = 0;
@@ -79,15 +82,18 @@ void paging_init() {
 	}
 
 	// create a page directory
-	PageDirectory* page_directory = kalloc_frame();
-	memset(page_directory, 0, sizeof(PageDirectory));
-	page_directory->entries[0].present  = 1;
-	page_directory->entries[0].writable = 1;
-	page_directory->entries[0].address  = (u32) page_table >> 12;
+	kernel_page_directory = kalloc_frame();
+	memset(kernel_page_directory, 0, sizeof(PageDirectory));
+	kernel_page_directory->entries[0].present  = 1;
+	kernel_page_directory->entries[0].writable = 1;
+	kernel_page_directory->entries[0].address  = (u32) page_table >> 12;
 
 	// enable the page directory
-	cr3_write((u32) page_directory);
+	cr3_write((u32) kernel_page_directory);
 	cr0 = cr0_read();
 	cr0 |= 0x80000000; // set the 32nd bit
 	cr0_write(cr0);
+}
+
+void paging_program_alloc(u32 start, u32 end) {
 }

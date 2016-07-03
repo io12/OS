@@ -1,4 +1,4 @@
-/* kalloc.c */
+/* mmap.c */
 
 #include <ints.h>
 #include <klibc.h>
@@ -16,18 +16,18 @@
 void* kalloc(u32 size);
 
 extern u32 kernel_end;
-u32 placement_address = (u32) &kernel_end;
+u32 kernel_end_address = (u32) &kernel_end;
 
 u32 total_memory; // in KB
 
 u32* frame_table;
 
-// not to be used after mmap_init_finalize
+// not to be used after mmap_init
 void* kalloc(u32 size) {
 	void* ret;
 
-	ret = (void*) placement_address;
-	placement_address += size;
+	ret = (void*) kernel_end_address;
+	kernel_end_address += size;
 
 	return ret;
 }
@@ -44,6 +44,8 @@ void* kalloc_frame() {
 		for (j = 0; j < 32; j++) {
 			// check if frame is free
 			if (((frame_table[i] >> j) & 0x1) == FREE) {
+				// update the kernel end address
+				kernel_end_address += FRAME_SIZE;
 				// set frame to used
 				frame_table[i] |= (USED << j);
 				// return address
@@ -56,17 +58,46 @@ void* kalloc_frame() {
 	return NULL;
 }
 
-// assumes contiguous blocks exist
-// only to be used early to prevent problems
+// TODO: efficiency
 void* kalloc_frames(u32 num) {
+	u32 i;
+	u32 j;
+	u8 found;
+
+	for (i = 0; i < FRAME_COUNT; i++) {
+		found = true;
+		for (j = 0; j < num; j++) {
+			if (mmap_index_check(i + j) == USED) {
+				found = false;
+				break;
+			}
+		}
+		if (found == true) {
+			for (j = 0; j < num; j++) {
+				mmap_index_set_used(i + j);
+			}
+			return (void*) (i * FRAME_SIZE);
+		}
+	}
+
+	return NULL;
+}
+
+// assumes contiguous blocks exist
+/*void* kalloc_frames_unsafe(u32 num) {
 	u32 i;
 
 	u32 address = (u32) kalloc_frame();
 	for (i = 1; i < num; i++) {
-		mmap_set_used(address + (i * FRAME_SIZE));
+		mmap_address_set_used(address + (i * FRAME_SIZE));
+		kernel_end_address += FRAME_SIZE;
 	}
 
 	return (void*) address;
+}*/
+
+u8 mmap_index_check(u32 n) {
+	return (frame_table[n / 32] >> (n % 32)) & 0x1;
 }
 
 void mmap_init(u32 size) {
@@ -76,18 +107,28 @@ void mmap_init(u32 size) {
 
 void mmap_init_finalize() {
 	// TODO: make this more efficient
-	//memset(frame_table, 0xFF, (placement_address / FRAME_SIZE) / 8);
+	//memset(frame_table, 0xFF, (kernel_end_address / FRAME_SIZE) / 8);
 	u32 i;
 
-	for (i = 0; i < placement_address; i++) {
-		mmap_set_used(i);
+	for (i = 0; i < kernel_end_address; i += FRAME_SIZE) {
+		mmap_address_set_used(i);
 	}
 }
 
-void mmap_set_free(u32 address) {
-	frame_table[(address / FRAME_SIZE) / 32] &= ~ (1 << ((address / FRAME_SIZE) % 32));
+void mmap_address_set_free(u32 address) {
+	frame_table[(address / FRAME_SIZE) / 32] &=
+		~ (1 << ((address / FRAME_SIZE) % 32));
 }
 
-void mmap_set_used(u32 address) {
-	frame_table[(address / FRAME_SIZE) / 32] |= (1 << ((address / FRAME_SIZE) % 32));
+void mmap_address_set_used(u32 address) {
+	frame_table[(address / FRAME_SIZE) / 32] |=
+		(1 << ((address / FRAME_SIZE) % 32));
+}
+
+void mmap_index_set_free(u32 n) {
+	frame_table[n / 32] &= ~ (1 << (n % 32));
+}
+
+void mmap_index_set_used(u32 n) {
+	frame_table[n / 32] |= 1 << (n % 32);
 }
