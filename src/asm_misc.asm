@@ -1,29 +1,21 @@
 ; asm_misc.asm ;
 
-; next 3 are interrupt instruction wrappers
-
-global cli
-cli:
-cli
-ret
-
-global sti
-sti:
+; this is called after all initialization
+global int_wait_forever
+int_wait_forever:
 sti
-ret
-
-global hlt
-hlt:
+.loop:
 hlt
+jmp	.loop
+; NOTREACHED
 ret
 
 ; unconditionally halt forever
 global permahalt
 permahalt:
 cli
-.loop:
 hlt
-jmp	.loop
+; NOTREACHED
 ret
 
 ; wrapper around the "out" asm instruction

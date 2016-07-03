@@ -12,9 +12,7 @@ void gdt_init();
 void idt_init();
 
 // asm_misc.asm
-void cli();
-void sti();
-void hlt();
+void int_wait_forever();
 void permahalt();
 void out(u16 port, u8 data);
 u8 in(u16 port);

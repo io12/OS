@@ -6,6 +6,26 @@
 
 #include <system.h>
 
+#define TYPE_FIFO  0x1000
+#define TYPE_CHAR  0x2000
+#define TYPE_DIR   0x4000
+#define TYPE_BLOCK 0x6000
+#define TYPE_FILE  0x8000
+#define TYPE_SYM   0xA000
+#define TYPE_SOCK  0xC000
+
+#define TYPE_MASK  0xF000
+
+// TODO: optimize
+// amount of references in a block pointer block
+#define INDIRECT_COUNT      (ext2_block_size / 4)
+// max block possible with different addressing methods
+#define DIRECT_MAX          11
+#define SINGLY_INDIRECT_MAX (DIRECT_MAX + INDIRECT_COUNT)
+#define DOUBLY_INDIRECT_MAX (SINGLY_INDIRECT_MAX + INDIRECT_COUNT * INDIRECT_COUNT)
+#define TRIPLY_INDIRECT_MAX (DOUBLY_INDIRECT_MAX + INDIRECT_COUNT * INDIRECT_COUNT \
+		* INDIRECT_COUNT)
+
 typedef struct {
 	u32 inode_count;
 	u32 block_count;
@@ -52,7 +72,7 @@ typedef struct {
 Ext2BlockGroupDescriptor;
 
 typedef struct {
-	u16 type_and_permissions;
+	u16 type;
 	u16 uid;
 
 	u32 size;
@@ -90,6 +110,7 @@ typedef struct {
 Ext2DirEntry;
 
 Ext2Inode* ext2_get_inode(u32 inode_num);
+u32 ext2_inode_get_block(Ext2Inode* inode, u32 block);
 
 Ext2Superblock* ext2_sb;
 Ext2BlockGroupDescriptor* ext2_bgd_table;
@@ -139,24 +160,76 @@ void ext2_init(u32 ramdisk_address) {
 	ext2_root_inode = ext2_get_inode(2);
 }
 
+u32 ext2_inode_get_block(Ext2Inode* inode, u32 block) {
+	// depth pointers
+	u32* ptr1;
+	u32* ptr2;
+	u32* ptr3;
+	// block indexes
+	u32 n1 = block - 12;
+	u32 n2 = (block - SINGLY_INDIRECT_MAX) / INDIRECT_COUNT;
+	u32 n3 = (block - SINGLY_INDIRECT_MAX) % INDIRECT_COUNT;
+	u32 n4 = (block - DOUBLY_INDIRECT_MAX) / (INDIRECT_COUNT * INDIRECT_COUNT);
+	u32 n5 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) / INDIRECT_COUNT;
+	u32 n6 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) % INDIRECT_COUNT;
+
+	// direct
+	if (block <= DIRECT_MAX) {
+		return inode->block[block];
+	}
+	// singly indirect
+	if (block <= SINGLY_INDIRECT_MAX) {
+		ptr1 = ext2_block_to_ptr(inode->block[12]);
+		return ptr1[n1];
+	}
+	// doubly indirect
+	if (block <= DOUBLY_INDIRECT_MAX) {
+		ptr1 = ext2_block_to_ptr(inode->block[13]);
+		ptr2 = ext2_block_to_ptr(ptr1[n2]);
+		return ptr2[n3];
+	}
+	// triply indirect
+	if (block <= TRIPLY_INDIRECT_MAX) {
+		ptr1 = ext2_block_to_ptr(inode->block[14]);
+		ptr2 = ext2_block_to_ptr(ptr1[n4]);
+		ptr3 = ext2_block_to_ptr(ptr2[n5]);
+		return ptr3[n6];
+	}
+
+	// BLOCK NUMBER TOO HIGH
+	return 0;
+}
+
 u32 ext2_path_to_inode_num(char* pathname) {
 	char* slash_ptr;
-	Ext2DirEntry* direntry_ptr = ext2_block_to_ptr(ext2_root_inode->block[0]);
-	u32 i = 0;
+	Ext2DirEntry* direntry = ext2_block_to_ptr(ext2_root_inode->block[0]);
+	Ext2Inode* inode = ext2_root_inode;
+	u32 inode_num;
+	u32 j = 0;
 
 	pathname++;
+	slash_ptr = pathname;
+	while (*slash_ptr != '\0') {
+		if (*slash_ptr == '/') {
+		}
+		slash_ptr++;
+	}
 	slash_ptr = strchr(pathname, '/');
 	if (slash_ptr != NULL) {
 		*slash_ptr = '\0';
 	}
 
-	while (i < ext2_block_size) {
-		if (strcmp(pathname, (char*) direntry_ptr->name) == 0) {
-			return direntry_ptr->inode_num;
+	while (j < inode->size) {
+		if (memcmp(pathname, direntry->name, direntry->name_len)
+				== 0 && direntry->name_len ==
+				strlen(pathname)) {
+			inode_num = direntry->inode_num;
+			inode = ext2_get_inode(inode_num);
+			break;
 		}
 
-		i += direntry_ptr->rec_len;
-		direntry_ptr = (((void*) direntry_ptr) + direntry_ptr->rec_len);
+		j += direntry->rec_len;
+		direntry = (((void*) direntry) + direntry->rec_len);
 	}
 
 	// FILE DOES NOT EXIST

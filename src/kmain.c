@@ -73,11 +73,13 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	kprintf(PL_SERIAL, "Initializing ext2 driver\n");
 	ext2_init(modules->mod_start);
 
-	kprintf(PL_SERIAL, "Initializing the process scheduler\n");
-	scheduler_init();
+	//kprintf(PL_SERIAL, "Initializing the process scheduler\n");
+	//scheduler_init();
 
 	kprintf(PL_FRAMEBUFFER, "%X\n", ext2_path_to_inode_num("/dir/"));
 
-	permahalt();
+	// done with all initialization
+	// wait for interrupts
+	int_wait_forever();
 	// NOTREACHED
 }
