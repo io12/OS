@@ -19,7 +19,7 @@
 // TODO: optimize
 // amount of references in a block pointer block
 #define INDIRECT_COUNT      (ext2_block_size / 4)
-// max block possible with different addressing methods
+// max blocks possible with different addressing methods
 #define DIRECT_MAX          11
 #define SINGLY_INDIRECT_MAX (DIRECT_MAX + INDIRECT_COUNT)
 #define DOUBLY_INDIRECT_MAX (SINGLY_INDIRECT_MAX + INDIRECT_COUNT * INDIRECT_COUNT)
@@ -105,12 +105,13 @@ typedef struct {
 	u8  name_len;
 	u8  file_type;
 
-	u8  name[];
+	u8  name[255];
 } __attribute__((packed))
 Ext2DirEntry;
 
+u32 ext2_find_file(const Ext2Inode* inode, const char* fname);
 Ext2Inode* ext2_get_inode(u32 inode_num);
-u32 ext2_inode_get_block(Ext2Inode* inode, u32 block);
+u32 ext2_inode_get_block(const Ext2Inode* inode, u32 block);
 
 Ext2Superblock* ext2_sb;
 Ext2BlockGroupDescriptor* ext2_bgd_table;
@@ -122,6 +123,26 @@ u32 ext2_block_size;
 
 void* ext2_block_to_ptr(u32 block) {
 	return (void*) (ext2_base_address + (block * ext2_block_size));
+}
+
+// find a file's inode based on its name
+u32 ext2_find_file(const Ext2Inode* inode, const char* fname) {
+	u32 i = 0;
+	u8* blockptr = ext2_block_to_ptr(ext2_inode_get_block(inode, 0));
+	Ext2DirEntry* dirptr = (Ext2DirEntry*) blockptr;
+
+	while (i < inode->size && i < ext2_block_size) {
+		if (memcmp(fname, dirptr->name, dirptr->name_len) == 0 &&
+				strlen(fname) == dirptr->name_len) {
+			return dirptr->inode_num;
+		}
+		i += dirptr->rec_len;
+		blockptr += dirptr->rec_len;
+		dirptr = (Ext2DirEntry*) blockptr;
+	}
+
+	// FILE NOT FOUND
+	return 0;
 }
 
 Ext2Inode* ext2_get_inode(u32 inode_num) {
@@ -160,7 +181,7 @@ void ext2_init(u32 ramdisk_address) {
 	ext2_root_inode = ext2_get_inode(2);
 }
 
-u32 ext2_inode_get_block(Ext2Inode* inode, u32 block) {
+u32 ext2_inode_get_block(const Ext2Inode* inode, u32 block) {
 	// depth pointers
 	u32* ptr1;
 	u32* ptr2;
@@ -170,8 +191,10 @@ u32 ext2_inode_get_block(Ext2Inode* inode, u32 block) {
 	u32 n2 = (block - SINGLY_INDIRECT_MAX) / INDIRECT_COUNT;
 	u32 n3 = (block - SINGLY_INDIRECT_MAX) % INDIRECT_COUNT;
 	u32 n4 = (block - DOUBLY_INDIRECT_MAX) / (INDIRECT_COUNT * INDIRECT_COUNT);
-	u32 n5 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) / INDIRECT_COUNT;
-	u32 n6 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) % INDIRECT_COUNT;
+	u32 n5 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) /
+		INDIRECT_COUNT;
+	u32 n6 = (block - DOUBLY_INDIRECT_MAX) % (INDIRECT_COUNT * INDIRECT_COUNT) %
+		INDIRECT_COUNT;
 
 	// direct
 	if (block <= DIRECT_MAX) {
@@ -200,38 +223,44 @@ u32 ext2_inode_get_block(Ext2Inode* inode, u32 block) {
 	return 0;
 }
 
-u32 ext2_path_to_inode_num(char* pathname) {
+u32 ext2_path_to_inode_num(u32 inode_num, char* fpath) {
+	Ext2Inode* inode = ext2_get_inode(inode_num);
 	char* slash_ptr;
-	Ext2DirEntry* direntry = ext2_block_to_ptr(ext2_root_inode->block[0]);
-	Ext2Inode* inode = ext2_root_inode;
-	u32 inode_num;
-	u32 j = 0;
+	u32 i = 0;
+	u32 depth = 0;
 
-	pathname++;
-	slash_ptr = pathname;
+	// handle absolute paths
+	if (*fpath == '/') {
+		fpath++;
+		inode_num = 2;
+		inode = ext2_root_inode;
+	}
+
+	// calculate file depth
+	slash_ptr = fpath;
 	while (*slash_ptr != '\0') {
 		if (*slash_ptr == '/') {
+			depth++;
 		}
 		slash_ptr++;
 	}
-	slash_ptr = strchr(pathname, '/');
-	if (slash_ptr != NULL) {
-		*slash_ptr = '\0';
-	}
 
-	while (j < inode->size) {
-		if (memcmp(pathname, direntry->name, direntry->name_len)
-				== 0 && direntry->name_len ==
-				strlen(pathname)) {
-			inode_num = direntry->inode_num;
-			inode = ext2_get_inode(inode_num);
-			break;
+	// iterate through the path
+	for (i = 0; i <= depth; i++) {
+		slash_ptr = strchr(fpath, '/');
+		if (slash_ptr != NULL) {
+			*slash_ptr = '\0';
 		}
 
-		j += direntry->rec_len;
-		direntry = (((void*) direntry) + direntry->rec_len);
+		inode_num = ext2_find_file(inode, fpath);
+		if (inode_num == 0) {
+			// FILE NOT FOUND
+			return 0;
+		}
+
+		inode = ext2_get_inode(inode_num);
+		fpath = slash_ptr + 1;
 	}
 
-	// FILE DOES NOT EXIST
-	return 0;
+	return inode_num;
 }

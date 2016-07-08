@@ -53,7 +53,7 @@ void paging_init();
 // drivers/ext2.c
 void* ext2_block_to_ptr(u32 block);
 void ext2_init(u32 ramdisk_address);
-u32 ext2_path_to_inode_num(char* pathname);
+u32 ext2_path_to_inode_num(u32 inode_num, char* fpath);
 
 // scheduler.c
 void scheduler_init();
