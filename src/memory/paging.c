@@ -94,6 +94,3 @@ void paging_init() {
 	cr0 |= 0x80000000; // set the 32nd bit
 	cr0_write(cr0);
 }
-
-void paging_program_alloc(u32 start, u32 end) {
-}

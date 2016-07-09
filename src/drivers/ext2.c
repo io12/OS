@@ -4,7 +4,7 @@
 #include <klibc.h>
 #include <kprintf.h>
 
-#include <system.h>
+#include <ext2.h>
 
 #define TYPE_FIFO  0x1000
 #define TYPE_CHAR  0x2000
@@ -72,32 +72,6 @@ typedef struct {
 Ext2BlockGroupDescriptor;
 
 typedef struct {
-	u16 type;
-	u16 uid;
-
-	u32 size;
-	u32 last_access_time;
-	u32 creation_time;
-	u32 last_modification_time;
-	u32 deletion_time;
-
-	u16 gid;
-	u16 hard_link_count;
-
-	u32 sectors_used_count;
-	u32 flags;
-	u32 os_specific_val_1;
-	u32 block[15];
-	u32 generation_num;
-	u32 file_acl;
-	u32 dir_acl;
-	u32 fragment_block;
-
-	u8  os_specific_val_2[12];
-} __attribute__((packed))
-Ext2Inode;
-
-typedef struct {
 	u32 inode_num;
 
 	u16 rec_len;
@@ -108,10 +82,6 @@ typedef struct {
 	u8  name[255];
 } __attribute__((packed))
 Ext2DirEntry;
-
-u32 ext2_find_file(const Ext2Inode* inode, const char* fname);
-Ext2Inode* ext2_get_inode(u32 inode_num);
-u32 ext2_inode_get_block(const Ext2Inode* inode, u32 block);
 
 Ext2Superblock* ext2_sb;
 Ext2BlockGroupDescriptor* ext2_bgd_table;
@@ -128,17 +98,17 @@ void* ext2_block_to_ptr(u32 block) {
 // find a file's inode based on its name
 u32 ext2_find_file(const Ext2Inode* inode, const char* fname) {
 	u32 i = 0;
-	u8* blockptr = ext2_block_to_ptr(ext2_inode_get_block(inode, 0));
-	Ext2DirEntry* dirptr = (Ext2DirEntry*) blockptr;
+	u8* block_ptr = ext2_block_to_ptr(ext2_inode_get_block(inode, 0));
+	Ext2DirEntry* dir_ptr = (Ext2DirEntry*) block_ptr;
 
 	while (i < inode->size && i < ext2_block_size) {
-		if (memcmp(fname, dirptr->name, dirptr->name_len) == 0 &&
-				strlen(fname) == dirptr->name_len) {
-			return dirptr->inode_num;
+		if (memcmp(fname, dir_ptr->name, dir_ptr->name_len) == 0 &&
+				strlen(fname) == dir_ptr->name_len) {
+			return dir_ptr->inode_num;
 		}
-		i += dirptr->rec_len;
-		blockptr += dirptr->rec_len;
-		dirptr = (Ext2DirEntry*) blockptr;
+		i += dir_ptr->rec_len;
+		block_ptr += dir_ptr->rec_len;
+		dir_ptr = (Ext2DirEntry*) block_ptr;
 	}
 
 	// FILE NOT FOUND

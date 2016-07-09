@@ -20,4 +20,7 @@ char* strchr(const char* str, int c);
 int strcmp(const char* s1, const char* s2);
 size_t strlen(const char* str);
 
+// sys/types.h
+typedef signed int ssize_t;
+
 #endif
