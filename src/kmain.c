@@ -2,14 +2,14 @@
 
 #include <sanitycheck.h>
 
+#include <ext2.h>
 #include <framebuffer.h>
 #include <ints.h>
+#include <klibc.h>
 #include <kprintf.h>
 #include <liballoc.h>
 #include <multiboot.h>
 #include <system.h>
-
-#include <klibc.h>
 
 // This is called as the first function after being loaded by bmain.
 void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
@@ -75,6 +75,13 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 
 	//kprintf(PL_SERIAL, "Initializing the process scheduler\n");
 	//scheduler_init();
+
+	char* gpl = calloc(35142, 1);
+	__asm__ volatile ("cli");
+	vfs_read(ext2_path_to_inode_num(2, "/LICENSE"), gpl, 35142, 0);
+	kprintf(PL_SERIAL, "%s\n", gpl);
+	kprintf(PL_FRAMEBUFFER, "%s\n", gpl);
+	free(gpl);
 
 	// done with all initialization
 	// wait for interrupts

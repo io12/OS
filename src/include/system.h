@@ -4,6 +4,7 @@
 #define _SYSTEM_H_
 
 #include <ints.h>
+#include <klibc.h>
 
 // memory/gdt.c
 void gdt_init();
@@ -49,6 +50,9 @@ void cr3_write(u32 cr3);
 
 // memory/paging.c
 void paging_init();
+
+// vfs.c
+ssize_t vfs_read(u32 inode_num, void* buf, size_t count, u32 pos);
 
 // scheduler.c
 void scheduler_init();

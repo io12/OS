@@ -1,34 +1,32 @@
+/* liballoc.h */
+
 #ifndef _LIBALLOC_H
 #define _LIBALLOC_H
 
 #include <klibc.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /** This is a boundary tag which is prepended to the
  * page or section of a page which we have allocated. It is
  * used to identify valid memory blocks that the
  * application is trying to free.
  */
-struct	boundary_tag
-{
-	unsigned int magic;			//< It's a kind of ...
-	unsigned int size; 			//< Requested size.
-	unsigned int real_size;		//< Actual size.
-	int index;					//< Location in the page table.
+struct boundary_tag {
+	unsigned int magic;
+	// requested size
+	unsigned int size;
+	// actual size
+	unsigned int real_size;
+	// location in the page table
+	int index;
 
-	struct boundary_tag *split_left;	//< Linked-list info for broken pages.	
-	struct boundary_tag *split_right;	//< The same.
-	
-	struct boundary_tag *next;	//< Linked list info.
-	struct boundary_tag *prev;	//< Linked list info.
+	// linked list info for broken pages
+	struct boundary_tag *split_left;
+	struct boundary_tag *split_right;
+
+	// linked list info
+	struct boundary_tag *next;
+	struct boundary_tag *prev;
 };
-
-
- 
 
 /** This function is supposed to lock the memory data structures. It
  * could be as simple as disabling interrupts or acquiring a spinlock.
@@ -37,7 +35,7 @@ struct	boundary_tag
  * \return 0 if the lock was acquired successfully. Anything else is
  * failure.
  */
-extern int liballoc_lock();
+int liballoc_lock();
 
 /** This function unlocks what was previously locked by the liballoc_lock
  * function.  If it disabled interrupts, it enables interrupts. If it
@@ -45,7 +43,7 @@ extern int liballoc_lock();
  *
  * \return 0 if the lock was successfully released.
  */
-extern int liballoc_unlock();
+int liballoc_unlock();
 
 /** This is the hook into the local system which allocates pages. It
  * accepts an integer parameter which is the number of pages
@@ -54,7 +52,7 @@ extern int liballoc_unlock();
  * \return NULL if the pages were not allocated.
  * \return A pointer to the allocated memory.
  */
-extern void* liballoc_alloc(int);
+void* liballoc_alloc(int num);
 
 /** This frees previously allocated memory. The void* parameter passed
  * to the function is the exact same value returned from a previous
@@ -64,20 +62,11 @@ extern void* liballoc_alloc(int);
  *
  * \return 0 if the memory was successfully freed.
  */
-extern int liballoc_free(void*,int);
+int liballoc_free(void* ptr, int num);
 
-       
-
-void     *malloc(size_t);				//< The standard function.
-void     *realloc(void *, size_t);		//< The standard function.
-void     *calloc(size_t, size_t);		//< The standard function.
-void      free(void *);					//< The standard function.
-
-
-#ifdef __cplusplus
-}
-#endif
+void *malloc(size_t);
+void *realloc(void *, size_t);
+void *calloc(size_t, size_t);
+void free(void *);
 
 #endif
-
-

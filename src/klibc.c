@@ -44,11 +44,11 @@ void* memset(void* ptr, int c, size_t n) {
 }
 
 char* strchr(const char* str, int c) {
-	while (*str != c && *str != '\0') {
-		str++;
+	while (*str != c) {
 		if (*str == '\0') {
 			return NULL;
 		}
+		str++;
 	}
 
 	return (char*) str;

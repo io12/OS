@@ -1,7 +1,7 @@
 AS        = nasm
 ASFLAGS   = -f elf32
 CFLAGS    = -m32 -ffreestanding -nostdlib -nostdinc
-CFLAGS   += -Wall -Wextra -std=c99 -O3 -g
+CFLAGS   += -Wall -Wextra -std=c99 -O2 -g
 CFLAGS   += -Isrc/libk/include -Isrc/include
 CFLAGS   += -fstack-protector-strong
 

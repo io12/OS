@@ -2,11 +2,10 @@
 
 #include <ints.h>
 #include <klibc.h>
-#include <kprintf.h>
 
 #include <liballoc.h>
 
-#define DEBUG	
+//#define DEBUG	
 
 #define LIBALLOC_MAGIC 0xc001c0de
 #define MAXCOMPLETE    5
@@ -48,7 +47,7 @@ i32 getexp(u32 size) {
 
 	if (size < (1 << MINEXP)) {
 #ifdef DEBUG
-		kprintf(PL_SERIAL, "getexp returns -1 for %u less than MINEXP\n", size);
+		kprintf(PL_SERIAL, "getexp returns -1 for %i less than MINEXP\n", size);
 #endif
 		// smaller than the quantum
 		return -1;
@@ -62,7 +61,7 @@ i32 getexp(u32 size) {
 	}
 
 #ifdef DEBUG
-	kprintf(PL_SERIAL, "getexp returns %u (%u bytes) for %u size\n", shift - 1,
+	kprintf(PL_SERIAL, "getexp returns %i (%i bytes) for %i size\n", shift - 1,
 			(1 << (shift - 1)), size);
 #endif
 
@@ -97,16 +96,16 @@ void dump_array() {
 	struct boundary_tag *tag = NULL;
 
 	kprintf(PL_SERIAL, "------ Free pages array ---------\n");
-	kprintf(PL_SERIAL, "System memory allocated: %u\n", l_allocated);
-	kprintf(PL_SERIAL, "Memory in used (malloc'ed): %u\n", l_inuse);
+	kprintf(PL_SERIAL, "System memory allocated: %i\n", l_allocated);
+	kprintf(PL_SERIAL, "Memory in used (malloc'ed): %i\n", l_inuse);
 
 	for (i = 0; i < MAXEXP; i++) {
-		kprintf(PL_SERIAL, "%.2i(%u): ",i, l_completePages[i]);
+		kprintf(PL_SERIAL, "%.2i(%i): ",i, l_completePages[i]);
 
 		tag = l_freePages[i];
 		while (tag != NULL) {
 			if (tag->split_left  != NULL) kprintf(PL_SERIAL, "*");
-			kprintf(PL_SERIAL, "%u", tag->real_size);
+			kprintf(PL_SERIAL, "%i", tag->real_size);
 			if (tag->split_right != NULL) kprintf(PL_SERIAL, "*");
 
 			kprintf(PL_SERIAL, " ");
@@ -116,6 +115,7 @@ void dump_array() {
 	}
 
 	kprintf(PL_SERIAL, "'*' denotes a split to the left/right of a tag\n");
+	fflush(stdout);
 }
 #endif
 
@@ -251,12 +251,12 @@ struct boundary_tag* allocate_new_tag(u32 size) {
 	tag->split_right = NULL;
 
 #ifdef DEBUG
-	kprintf(PL_SERIAL, "Resource allocated %X of %u pages (%u bytes) for %u "
-			"size.\n", (u32) tag, pages, pages * l_pageSize, size);
+	kprintf(PL_SERIAL, "Resource allocated %x of %i pages (%i bytes) for %i size.\n", tag,
+			pages, pages * l_pageSize, size);
 
 	l_allocated += pages * l_pageSize;
 
-	kprintf(PL_SERIAL, "Total memory usage = %u KB\n",  (int) ((l_allocated / (1024))));
+	kprintf(PL_SERIAL, "Total memory usage = %i KB\n",  (int) ((l_allocated / (1024))));
 #endif
 
 	return tag;
@@ -290,7 +290,7 @@ void *malloc(size_t size) {
 		if ((tag->real_size - sizeof(struct boundary_tag))
 				>= (size + sizeof(struct boundary_tag))) {
 #ifdef DEBUG
-			kprintf(PL_SERIAL, "Tag search found %u >= %u\n",(tag->real_size -
+			kprintf(PL_SERIAL, "Tag search found %i >= %i\n",(tag->real_size -
 						sizeof(struct boundary_tag)), (size
 						+ sizeof(struct boundary_tag)));
 #endif
@@ -323,8 +323,8 @@ void *malloc(size_t size) {
 	// Removed... see if we can re-use the excess space.
 
 #ifdef DEBUG
-	kprintf(PL_SERIAL, "Found tag with %u bytes available (requested %u bytes, leaving "
-			"%u), which has exponent: %u (%u bytes)\n", tag->real_size
+	kprintf(PL_SERIAL, "Found tag with %i bytes available (requested %i bytes, leaving "
+			"%i), which has exponent: %i (%i bytes)\n", tag->real_size
 			- sizeof(struct boundary_tag), size, tag->real_size - size
 			- sizeof(struct boundary_tag), index, 1<<index);
 #endif
@@ -338,13 +338,13 @@ void *malloc(size_t size) {
 
 		if (childIndex >= 0) {
 #ifdef DEBUG
-			kprintf(PL_SERIAL, "Seems to be splittable: %u >= 2^%u .. %u\n",
+			kprintf(PL_SERIAL, "Seems to be splittable: %i >= 2^%i .. %i\n",
 					remainder, childIndex, (1<<childIndex));
 #endif
 			struct boundary_tag *new_tag = split_tag(tag); 
 #ifdef DEBUG
-			kprintf(PL_SERIAL, "Old tag has become %u bytes, new tag is now %u "
-					"bytes (%u exp)\n", tag->real_size,
+			kprintf(PL_SERIAL, "Old tag has become %i bytes, new tag is now %i "
+					"bytes (%i exp)\n", tag->real_size,
 					new_tag->real_size, new_tag->index);
 #endif
 		}
@@ -354,7 +354,7 @@ void *malloc(size_t size) {
 
 #ifdef DEBUG
 	l_inuse += size;
-	kprintf(PL_SERIAL, "malloc: %X,  %u, %u\n", (u32) ptr, (int) l_inuse / 1024,
+	kprintf(PL_SERIAL, "malloc: %x,  %i, %i\n", ptr, (int) l_inuse / 1024,
 			(int) l_allocated / 1024);
 	dump_array();
 #endif
@@ -382,15 +382,15 @@ void free(void* ptr) {
 
 #ifdef DEBUG
 	l_inuse -= tag->size;
-	kprintf(PL_SERIAL, "free: %X, %u, %u\n", (u32) ptr, (int) l_inuse / 1024,
+	kprintf(PL_SERIAL, "free: %x, %i, %i\n", ptr, (int) l_inuse / 1024,
 			(int) l_allocated / 1024);
 #endif
 
 	// MELT LEFT...
 	while ((tag->split_left != NULL) && (tag->split_left->index >= 0)) {
 #ifdef DEBUG
-		kprintf(PL_SERIAL, "Melting tag left into available memory. Left was %u, "
-				"becomes %u (%u)\n", tag->split_left->real_size,
+		kprintf(PL_SERIAL, "Melting tag left into available memory. Left was %i, "
+				"becomes %i (%i)\n", tag->split_left->real_size,
 				tag->split_left->real_size + tag->real_size,
 				tag->split_left->real_size);
 #endif
@@ -401,8 +401,8 @@ void free(void* ptr) {
 	// MELT RIGHT...
 	while ((tag->split_right != NULL) && (tag->split_right->index >= 0)) {
 #ifdef DEBUG
-		kprintf(PL_SERIAL, "Melting tag right into available memory. This was was %u, "
-				"becomes %u (%u)\n", tag->real_size,
+		kprintf(PL_SERIAL, "Melting tag right into available memory. This was was %i, "
+				"becomes %i (%i)\n", tag->real_size,
 				tag->split_right->real_size + tag->real_size,
 				tag->split_right->real_size);
 #endif
@@ -432,8 +432,7 @@ void free(void* ptr) {
 
 #ifdef DEBUG
 			l_allocated -= pages * l_pageSize;
-			kprintf(PL_SERIAL, "Resource freeing %X of %u pages\n",
-					(u32) tag, pages);
+			kprintf(PL_SERIAL, "Resource freeing %x of %i pages\n", tag, pages);
 			dump_array();
 #endif
 
@@ -450,8 +449,8 @@ void free(void* ptr) {
 	insert_tag(tag, index);
 
 #ifdef DEBUG
-	kprintf(PL_SERIAL, "Returning tag with %u bytes (requested %u bytes), which has "
-			"exponent: %u\n", tag->real_size, tag->size, index); 
+	kprintf(PL_SERIAL, "Returning tag with %i bytes (requested %i bytes), which has "
+			"exponent: %i\n", tag->real_size, tag->size, index); 
 	dump_array();
 #endif
 
@@ -484,10 +483,14 @@ void* realloc(void *p, size_t size) {
 		return malloc(size);
 	}
 
-	liballoc_lock();
+	if (liballoc_lock != NULL) {
+		liballoc_lock();
+	}
 	tag = (struct boundary_tag*) ((u32) p - sizeof(struct boundary_tag));
 	real_size = tag->size;
-	liballoc_unlock();
+	if (liballoc_unlock != NULL) {
+		liballoc_unlock();
+	}
 
 	if (real_size > size) {
 		real_size = size;
