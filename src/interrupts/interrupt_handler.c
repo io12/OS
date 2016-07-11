@@ -50,7 +50,7 @@ IRQroutine irq_routines[16] = {NULL};
 
 void isr_handler(InterruptSave is) {
 	if (is.int_num < ISR_COUNT) {
-		kprintf(PL_FRAMEBUFFER,
+		kprintf(PL_ALL,
 				"%s exception\n"
 				"PANIC\n"
 				"interrupt number: 0x%X\n"

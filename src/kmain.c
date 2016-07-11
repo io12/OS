@@ -78,7 +78,7 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 
 	char* gpl = calloc(35142, 1);
 	__asm__ volatile ("cli");
-	vfs_read(ext2_path_to_inode_num(2, "/LICENSE"), gpl, 35142, 0);
+	vfs_read(ext2_path_to_inode_num(2, "/LICENSE"), gpl, 35142, 100);
 	kprintf(PL_SERIAL, "%s\n", gpl);
 	kprintf(PL_FRAMEBUFFER, "%s\n", gpl);
 	free(gpl);

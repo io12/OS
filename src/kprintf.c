@@ -9,8 +9,24 @@
 
 #define DEC_BUF_SIZE 11
 #define HEX_BUF_SIZE 10
-#define PUTCHAR(X)   (pl == PL_FRAMEBUFFER ? fb_putchar(X) : serial_putchar(X))
-#define PUTS(X)      (pl == PL_FRAMEBUFFER ? fb_puts(X)    : serial_puts(X))
+#define PUTCHAR(X)   \
+	do { \
+		if (pl == PL_ALL || pl == PL_FRAMEBUFFER) { \
+			fb_putchar(X); \
+		} \
+		if (pl == PL_ALL || pl == PL_SERIAL) { \
+			serial_putchar(X); \
+		} \
+	} while (0)
+#define PUTS(X)   \
+	do { \
+		if (pl == PL_ALL || pl == PL_FRAMEBUFFER) { \
+			fb_puts(X); \
+		} \
+		if (pl == PL_ALL || pl == PL_SERIAL) { \
+			serial_puts(X); \
+		} \
+	} while (0)
 
 char hex_digits[] = "0123456789ABCDEF";
 
