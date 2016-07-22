@@ -128,7 +128,7 @@ void ext2_init(u32 ramdisk_address) {
 	ext2_sb = (void*) (ext2_base_address + 1024);
 
 	if (ext2_sb->signature != 0xEF53) {
-		kprintf(PL_FRAMEBUFFER, "Signature on ext2 ramdisk 0x%X not valid. "
+		kprintf(PL_ALL, "Signature on ext2 ramdisk 0x%X not valid. "
 				"Should be 0xEF53.\n", ext2_sb->signature);
 	}
 

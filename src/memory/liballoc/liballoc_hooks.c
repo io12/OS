@@ -11,7 +11,7 @@ int liballoc_lock() {
 }
 
 int liballoc_unlock() {
-	//__asm__ volatile ("sti");
+	__asm__ volatile ("sti");
 
 	return 0;
 }

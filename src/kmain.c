@@ -20,7 +20,7 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	fb_init();
 
 	if (mboot_magic != MULTIBOOT_EAX_MAGIC) {
-		kprintf(PL_FRAMEBUFFER,
+		kprintf(PL_ALL,
 				"Incorrect magic value: 0x%X\n"
 				"Not booted with a multiboot compatible bootloader\n"
 				"HALTING",
@@ -76,12 +76,9 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	//kprintf(PL_SERIAL, "Initializing the process scheduler\n");
 	//scheduler_init();
 
-	char* gpl = calloc(35142, 1);
-	__asm__ volatile ("cli");
-	vfs_read(ext2_path_to_inode_num(2, "/LICENSE"), gpl, 35142, 100);
-	kprintf(PL_SERIAL, "%s\n", gpl);
-	kprintf(PL_FRAMEBUFFER, "%s\n", gpl);
-	free(gpl);
+	u8* elf = malloc(488);
+	vfs_read(ext2_path_to_inode_num(2, "/a.out"), elf, 488, 0);
+	free(elf);
 
 	// done with all initialization
 	// wait for interrupts
