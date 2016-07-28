@@ -54,7 +54,7 @@ void fb_mov() {
 }
 
 // Creates a framebuffer cell based on two colors and an ascii value
-u16 fb_mkchar(FBcolor bg, FBcolor fg, u8 ascii) {
+u16 fb_mkchar(FB_Color bg, FB_Color fg, u8 ascii) {
 	return ((u8) bg << 12) | ((u8) fg << 8) | ascii;
 }
 

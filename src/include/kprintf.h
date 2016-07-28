@@ -14,7 +14,7 @@ typedef __builtin_va_list va_list;
 typedef enum {
 	PL_ALL,
 	PL_FRAMEBUFFER,
-	PL_SERIAL
+	PL_SERIAL,
 } PrintLocation;
 
 void kprint_udec(PrintLocation pl, u32 num);
