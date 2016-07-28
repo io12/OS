@@ -16,3 +16,10 @@ mov	ss, ax
 jmp	0x08:.reload_cs
 .reload_cs:
 ret
+
+global tss_load
+tss_load:
+; load the TSS
+mov	ax, 0x2B
+ltr	ax
+ret

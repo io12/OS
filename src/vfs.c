@@ -4,6 +4,7 @@
 #include <ints.h>
 #include <klibc.h>
 
+// TODO: clean this up
 ssize_t vfs_read(u32 inode_num, void* buf, size_t count, u32 pos) {
 	Ext2Inode* inode = ext2_get_inode(inode_num);
 	u8* block_ptr;

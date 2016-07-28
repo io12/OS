@@ -11,7 +11,7 @@ int liballoc_lock() {
 }
 
 int liballoc_unlock() {
-	__asm__ volatile ("sti");
+	//__asm__ volatile ("sti");
 
 	return 0;
 }
@@ -21,13 +21,7 @@ void* liballoc_alloc(int num) {
 }
 
 int liballoc_free(void* ptr, int num) {
-	u32 address = (u32) ptr;
-	u32 i = address;
-
-	while (i < address + (num * FRAME_SIZE)) {
-		mmap_address_set_free(address);
-		i += FRAME_SIZE;
-	}
+	kfree_frames(ptr, num);
 
 	return 0;
 }

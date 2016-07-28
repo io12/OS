@@ -15,7 +15,7 @@ typedef unsigned int size_t;
 // string.h
 int memcmp(const void* p1, const void* p2, size_t n);
 void* memcpy(void* dest, const void* src, size_t n);
-void* memset(void* s, int c, size_t n);
+void* memset(void* ptr, int c, size_t n);
 char* strchr(const char* str, int c);
 int strcmp(const char* s1, const char* s2);
 size_t strlen(const char* str);

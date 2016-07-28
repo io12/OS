@@ -9,7 +9,10 @@
 #include <kprintf.h>
 #include <liballoc.h>
 #include <multiboot.h>
+#include <paging.h>
 #include <system.h>
+
+void elf_exec(void* file);
 
 // This is called as the first function after being loaded by bmain.
 void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
@@ -67,18 +70,21 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	kprintf(PL_SERIAL, "Finalizing the memory map\n");
 	mmap_init_finalize();
 
-	//kprintf(PL_SERIAL, "Initializing paging\n");
-	//paging_init();
+	kprintf(PL_SERIAL, "Initializing paging\n");
+	paging_init();
 
 	kprintf(PL_SERIAL, "Initializing ext2 driver\n");
 	ext2_init(modules->mod_start);
 
-	//kprintf(PL_SERIAL, "Initializing the process scheduler\n");
-	//scheduler_init();
+	kprintf(PL_SERIAL, "Initializing the process scheduler\n");
+	scheduler_init();
 
-	u8* elf = malloc(488);
-	vfs_read(ext2_path_to_inode_num(2, "/a.out"), elf, 488, 0);
+	char* elf = malloc(488);
+	vfs_read(ext2_path_to_inode_num(2, "a.out"), elf, 488, 0);
+	elf_exec(elf);
 	free(elf);
+
+	//enter_user_mode();
 
 	// done with all initialization
 	// wait for interrupts

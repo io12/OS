@@ -32,7 +32,7 @@ void* kalloc(u32 size) {
 	return ret;
 }
 
-void* kalloc_frame() {
+/*void* kalloc_frame() {
 	u32 i;
 	u32 j;
 
@@ -56,7 +56,7 @@ void* kalloc_frame() {
 
 	// NO FREE FRAMES
 	return NULL;
-}
+}*/
 
 // TODO: efficiency
 void* kalloc_frames(u32 num) {
@@ -80,6 +80,7 @@ void* kalloc_frames(u32 num) {
 		}
 	}
 
+	// NOT ENOUGH FRAMES FOUND
 	return NULL;
 }
 
@@ -87,7 +88,7 @@ void* kalloc_frames(u32 num) {
 /*void* kalloc_frames_unsafe(u32 num) {
 	u32 i;
 
-	u32 address = (u32) kalloc_frame();
+	u32 address = (u32) kalloc_frames(1);
 	for (i = 1; i < num; i++) {
 		mmap_address_set_used(address + (i * FRAME_SIZE));
 		kernel_end_address += FRAME_SIZE;
@@ -95,6 +96,16 @@ void* kalloc_frames(u32 num) {
 
 	return (void*) address;
 }*/
+
+void kfree_frames(void* ptr, u32 num) {
+	u32 address = (u32) ptr;
+	u32 i = address;
+
+	while (i < address + (num * FRAME_SIZE)) {
+		mmap_address_set_free(address);
+		i += FRAME_SIZE;
+	}
+}
 
 u8 mmap_index_check(u32 n) {
 	return (frame_table[n / 32] >> (n % 32)) & 0x1;

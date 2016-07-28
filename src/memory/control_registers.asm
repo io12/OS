@@ -21,3 +21,8 @@ cr3_write:
 mov	eax, [esp + 4]
 mov	cr3, eax
 ret
+
+global invlpg
+invlpg:
+invlpg	[esp + 4]
+ret

@@ -34,9 +34,9 @@ typedef struct {
 InterruptSave;
 
 // a function pointer to an IRQ routine
-typedef void (*IRQroutine)(InterruptSave is);
+typedef void (*IRQ_Routine)(InterruptSave* is);
 
-void irq_new_routine(u8 n, IRQroutine routine);
+void irq_new_routine(u8 n, IRQ_Routine routine);
 void irq_remove_routine(u8 n);
 
 #endif

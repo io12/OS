@@ -44,7 +44,7 @@ const char* exception_messages[ISR_COUNT] = {
 	"Reserved"
 };
 
-IRQroutine irq_routines[16] = {NULL};
+IRQ_Routine irq_routines[16] = {NULL};
 
 // next two functions are called on interrupt
 
@@ -73,12 +73,12 @@ void isr_handler(InterruptSave is) {
 }
 
 void irq_handler(InterruptSave is) {
-	IRQroutine routine = irq_routines[is.int_num - 32];
+	IRQ_Routine routine = irq_routines[is.int_num - 32];
 
 	kprintf(PL_SERIAL, "IRQ interrupt %u\n", is.int_num);
 	if (routine != NULL) {
 		kprintf(PL_SERIAL, "Callback is registered. Running.\n");
-		routine(is);
+		routine(&is);
 	}
 	out(0x20, 0x20);
 	if (is.int_num >= 40) {
@@ -86,7 +86,7 @@ void irq_handler(InterruptSave is) {
 	}
 }
 
-void irq_new_routine(u8 n, IRQroutine routine) {
+void irq_new_routine(u8 n, IRQ_Routine routine) {
 	irq_routines[n] = routine;
 }
 
