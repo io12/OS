@@ -25,11 +25,11 @@ typedef enum {
 	FB_WHITE    = 15,
 } FB_Color;
 
-u8   fb_getx();
-u8   fb_gety();
+u8 fb_getx();
+u8 fb_gety();
 void fb_init();
 void fb_mov();
-u16  fb_mkchar(FB_Color bg, FB_Color fg, u8 ascii);
+u16 fb_mkchar(FB_Color bg, FB_Color fg, u8 ascii);
 void fb_putchar(u8 ascii);
 void fb_puts(const char* str);
 void fb_setpos(u8 x, u8 y);
