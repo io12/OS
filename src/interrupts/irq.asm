@@ -1,5 +1,3 @@
-; irq.asm ;
-
 %macro IRQ 2
 global _irq%1
 _irq%1:

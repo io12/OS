@@ -1,5 +1,3 @@
-; isr.asm ;
-
 %macro ISR_ERRCODE 1
 global _isr%1
 _isr%1:

@@ -1,5 +1,3 @@
-; gdt_load.asm ;
-
 global gdt_load
 gdt_load:
 ; load the GDT

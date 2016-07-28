@@ -1,5 +1,3 @@
-/* liballoc_hooks.c */
-
 #include <system.h>
 
 #define FRAME_SIZE 0x1000

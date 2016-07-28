@@ -1,5 +1,3 @@
-/* sanitycheck.h */
-
 // A few checks to make sure the Makefile wasn't tampered with
 
 #ifndef _SANITYCHECK_H_

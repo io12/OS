@@ -1,5 +1,3 @@
-/* paging.c */
-
 #include <ints.h>
 #include <klibc.h>
 #include <system.h>

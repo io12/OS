@@ -1,5 +1,3 @@
-/* elf.c */
-
 #include <ints.h>
 #include <klibc.h>
 #include <kprintf.h>

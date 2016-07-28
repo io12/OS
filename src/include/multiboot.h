@@ -1,5 +1,3 @@
-/* multiboot.h */
-
 #ifndef _MULTIBOOT_H_
 #define _MULTIBOOT_H_
 

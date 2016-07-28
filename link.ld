@@ -1,5 +1,3 @@
-/* link.ld */
-
 ENTRY(bmain)
 
 SECTIONS {

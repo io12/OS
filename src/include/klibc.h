@@ -1,5 +1,3 @@
-/* klibc.h */
-
 #ifndef _KLIBC_H_
 #define _KLIBC_H_
 

@@ -1,5 +1,3 @@
-/* vfs.c */
-
 #include <ext2.h>
 #include <ints.h>
 #include <klibc.h>

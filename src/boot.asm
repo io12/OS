@@ -1,5 +1,3 @@
-; boot.asm ;
-
 ; Define constants for the multiboot header.
 ; MAGIC_NUMBER + FLAGS + CHECKSUM must equal 0 for the header to be valid.
 MAGIC_NUMBER	equ 0x1BADB002

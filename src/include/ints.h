@@ -1,7 +1,3 @@
-/* ints.h */
-
-// Similar to stdint.h
-
 #ifndef _INTS_H_
 #define _INTS_H_
 

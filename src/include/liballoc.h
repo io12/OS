@@ -1,5 +1,3 @@
-/* liballoc.h */
-
 #ifndef _LIBALLOC_H
 #define _LIBALLOC_H
 

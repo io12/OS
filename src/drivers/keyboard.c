@@ -1,5 +1,3 @@
-/* keyboard.c */
-
 #include <framebuffer.h>
 #include <interrupt_handler.h>
 #include <ints.h>

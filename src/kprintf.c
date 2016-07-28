@@ -1,5 +1,3 @@
-/* kprintf.c */
-
 #include <framebuffer.h>
 #include <ints.h>
 #include <klibc.h>

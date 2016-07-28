@@ -1,5 +1,3 @@
-/* klibc.c */
-
 #include <ints.h>
 
 #include <klibc.h>

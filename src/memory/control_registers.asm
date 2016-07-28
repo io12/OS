@@ -1,5 +1,3 @@
-; control_registers.asm ;
-
 global cr0_read
 cr0_read:
 mov	eax, cr0

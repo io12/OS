@@ -1,5 +1,3 @@
-/* serial.c */
-
 #include <klibc.h>
 
 #include <system.h>

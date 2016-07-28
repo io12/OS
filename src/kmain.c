@@ -1,5 +1,3 @@
-/* kmain.c */
-
 #include <sanitycheck.h>
 
 #include <ext2.h>

@@ -1,5 +1,3 @@
-/* scheduler.c */
-
 #include <interrupt_handler.h>
 #include <klibc.h>
 #include <kprintf.h>

@@ -1,5 +1,3 @@
-/* mmap.c */
-
 #include <ints.h>
 #include <klibc.h>
 #include <multiboot.h>

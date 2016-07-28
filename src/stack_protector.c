@@ -1,5 +1,3 @@
-/* stack_protector.c */
-
 #include <ints.h>
 #include <kprintf.h>
 #include <system.h>

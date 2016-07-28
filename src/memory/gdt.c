@@ -1,5 +1,3 @@
-/* gdt.c */
-
 #include <ints.h>
 
 #include <system.h>

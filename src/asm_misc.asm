@@ -1,5 +1,3 @@
-; asm_misc.asm ;
-
 global sti
 sti:
 sti
