@@ -23,7 +23,6 @@ void keyboard_init();
 
 // drivers/serial.c
 #define COM1 0x3F8
-
 void serial_init(u16 com);
 int serial_fifo_isempty(u16 com);
 void serial_wait();

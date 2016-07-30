@@ -39,7 +39,7 @@ const char* exception_messages[ISR_COUNT] = {
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Reserved"
+	"Reserved",
 };
 
 IRQ_Routine irq_routines[16] = {NULL};

@@ -5,6 +5,8 @@
 
 #include <system.h>
 
+#define USER_STACK_HIGH 0x00401000
+
 typedef struct process {
 	InterruptSave is;
 	u32 cr3;
@@ -80,10 +82,12 @@ void scheduler_callback(InterruptSave* is) {
 	memcpy(is, &process_current->is, sizeof(InterruptSave));
 	cr3_write(process_current->cr3);
 
-	// jump to entry point of the executable if it hasn't been started yet
+	// initialize program if not started yet
 	if (process_current->started == false) {
 		process_current->started = true;
 		is->eip = process_current->entry;
+		is->useresp = USER_STACK_HIGH;
+
 		// enter user mode if needed
 		if (is->cs != 0x1B) {
 			is->gs = 0x23;

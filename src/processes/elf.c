@@ -4,6 +4,8 @@
 #include <paging.h>
 #include <system.h>
 
+#define USER_STACK_LOW 0x00400000
+
 #define SHT_NOBITS 8
 
 typedef struct {
@@ -55,6 +57,7 @@ void elf_exec(void* file) {
 	ELF32_Header* header = file;
 	ELF32_SectionHeader* section_header;
 	PageDirectory* page_dir;
+	PageTableEntry* stack_page;
 	u32 i = 0;
 	u32 j = 0;
 
@@ -96,6 +99,12 @@ void elf_exec(void* file) {
 		}
 		i += header->e_shentsize;
 	}
+
+	// allocate a 4KiB stack
+	stack_page = paging_get_page(USER_STACK_LOW, page_dir);
+	paging_frame_alloc(stack_page);
+	stack_page->writable = 1;
+	invlpg(USER_STACK_LOW);
 
 	scheduler_new_process(header->e_entry, (u32) page_dir);
 }

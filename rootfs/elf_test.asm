@@ -1,5 +1,7 @@
 global _start
 _start:
+xchg	bx, bx
 mov	eax, 0xDEADBEEF
-int	10
+push	eax
+pop	ebx
 jmp	$

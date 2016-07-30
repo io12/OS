@@ -53,6 +53,8 @@ struct {
 } __attribute__((packed))
 tss;
 
+extern u32 kernel_stack_high;
+
 void gdt_init() {
 	gdt_ptr.limit = sizeof(gdt) - 1;
 	gdt_ptr.base  = (u32) &gdt;
@@ -70,7 +72,7 @@ void gdt_init() {
 	// TSS
 	memset(&tss, 0, sizeof(tss));
 	tss.ss0  = 0x10;
-	tss.esp0 = 0x0;
+	tss.esp0 = (u32) &kernel_stack_high;
 	gdt_set_gate(5, (u32) &tss, (u32) &tss + sizeof(tss), 0xE9, 0x00);
 
 	gdt_load((u32) &gdt_ptr);

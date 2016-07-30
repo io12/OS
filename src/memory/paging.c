@@ -1,12 +1,13 @@
 #include <ints.h>
 #include <klibc.h>
+#include <kprintf.h>
 #include <system.h>
 
 #include <paging.h>
 
 #define PAGE_SIZE 0x1000
 
-#define SHIFT(address) ((address) >> 12)
+#define SHIFT(address)   ((address) >> 12)
 #define UNSHIFT(address) ((address) << 12)
 
 PageDirectory* kernel_page_directory;
@@ -68,11 +69,12 @@ void paging_frame_alloc(PageTableEntry* page) {
 	void* ptr = kalloc_frames(1);
 
 	if (page->address != 0) {
-		paging_frame_free(page);
+		kprintf(PL_ALL, "Page is already allocated\n");
+		return;
 	}
-	page->address  = SHIFT((u32) ptr);
-	page->present  = 1;
-	page->user     = 1;
+	page->address = SHIFT((u32) ptr);
+	page->present = 1;
+	page->user    = 1;
 }
 
 void paging_frame_free(PageTableEntry* page) {

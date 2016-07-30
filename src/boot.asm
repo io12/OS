@@ -15,9 +15,9 @@ dd	CHECKSUM
 section .bss
 align 4
 ; Allocate space for a stack (required to run C code)
-kernel_stack_top:
 resb	8192
-kernel_stack_bottom:
+global kernel_stack_high
+kernel_stack_high:
 
 section .text
 ; Entry point
@@ -26,7 +26,7 @@ bmain:
 ; bochs magic breakpoint
 xchg	bx, bx
 ; set the stack pointer
-mov	esp, kernel_stack_bottom
+mov	esp, kernel_stack_high
 ; disable interrupts before interrupt handling is in place
 cli
 ; push multiboot header pointer
