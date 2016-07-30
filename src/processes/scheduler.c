@@ -17,8 +17,9 @@ typedef struct process {
 
 void scheduler_callback(InterruptSave* is);
 
-Process* process_queue;
-Process* process_current;
+Process* process_queue    = NULL;
+Process* process_current  = NULL;
+Process* process_previous = NULL;
 
 void scheduler_init() {
 	// A divisor needs to be sent to the PIT that divides it's internal
@@ -32,10 +33,6 @@ void scheduler_init() {
 	out(0x43, 0x36);
 	out(0x40, (div & 0xFF));
 	out(0x40, (div >> 8));
-
-	// intialize process queue
-	process_queue   = NULL;
-	process_current = NULL;
 }
 
 void scheduler_new_process(u32 entry, u32 cr3) {
@@ -60,6 +57,20 @@ void scheduler_new_process(u32 entry, u32 cr3) {
 	process->next    = NULL;
 }
 
+void scheduler_exit_current() {
+	if (process_previous == NULL) {
+		process_queue = process_current->next;
+		free(process_current);
+		process_current = process_queue;
+	}
+	else {
+		process_previous->next = process_current->next;
+		free(process_current);
+		process_current  = process_queue;
+		process_previous = NULL;
+	}
+}
+
 void scheduler_callback(InterruptSave* is) {
 	if (process_current == NULL) {
 		kprintf(PL_SERIAL, "Process switcher called, but no process is "
@@ -72,10 +83,12 @@ void scheduler_callback(InterruptSave* is) {
 
 	// switch to the next process, or recycle if necessary
 	if (process_current->next == NULL) {
-		process_current = process_queue;
+		process_current  = process_queue;
+		process_previous = NULL;
 	}
 	else {
-		process_current = process_current->next;
+		process_previous = process_current;
+		process_current  = process_current->next;
 	}
 
 	// change the registers to the new process

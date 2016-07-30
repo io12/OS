@@ -7,6 +7,8 @@
 
 #define ISR_COUNT 32
 
+void syscall_handler(InterruptSave* is);
+
 const char* exception_messages[ISR_COUNT] = {
 	"Division by zero",
 	"Debug",
@@ -47,27 +49,29 @@ IRQ_Routine irq_routines[16] = {NULL};
 // next two functions are called on interrupt
 
 void isr_handler(InterruptSave is) {
-	if (is.int_num < ISR_COUNT) {
-		kprintf(PL_ALL,
-				"%s exception\n"
-				"PANIC\n"
-				"interrupt number: 0x%X\n"
-				"error code: 0x%X\n"
-				"\n"
-				"eax=0x%X ebx=0x%X ecx=0x%X edx=0x%X\n"
-				"esp=0x%X ebp=0x%X esi=0x%X edi=0x%X\n"
-				"cs=0x%X ds=0x%X ss=0x%X es=0x%X fs=0x%X gs=0x%X\n"
-				"eip=0x%X\n",
-				exception_messages[is.int_num],
-				is.int_num,
-				is.err,
-				is.eax, is.ebx, is.ecx, is.edx,
-				is.esp, is.ebp, is.esi, is.edi,
-				is.cs, is.ds, is.ss, is.es, is.fs, is.gs,
-				is.eip);
-		permahalt();
-		// NOTREACHED
+	if (is.int_num == 0xBA) {
+		syscall_handler(&is);
+		return;
 	}
+	kprintf(PL_ALL,
+			"%s exception\n"
+			"PANIC\n"
+			"interrupt number: 0x%X\n"
+			"error code: 0x%X\n"
+			"\n"
+			"eax=0x%X ebx=0x%X ecx=0x%X edx=0x%X\n"
+			"esp=0x%X ebp=0x%X esi=0x%X edi=0x%X\n"
+			"cs=0x%X ds=0x%X ss=0x%X es=0x%X fs=0x%X gs=0x%X\n"
+			"eip=0x%X\n",
+			exception_messages[is.int_num],
+			is.int_num,
+			is.err,
+			is.eax, is.ebx, is.ecx, is.edx,
+			is.esp, is.ebp, is.esi, is.edi,
+			is.cs, is.ds, is.ss, is.es, is.fs, is.gs,
+			is.eip);
+	permahalt();
+	// NOTREACHED
 }
 
 void irq_handler(InterruptSave is) {

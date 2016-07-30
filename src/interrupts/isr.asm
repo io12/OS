@@ -2,7 +2,7 @@
 global _isr%1
 _isr%1:
 cli
-push	byte %1
+push	%1
 jmp	isr_common_stub
 %endmacro
 
@@ -10,8 +10,8 @@ jmp	isr_common_stub
 global _isr%1
 _isr%1:
 cli
-push	byte 0
-push	byte %1
+push	0
+push	%1
 jmp	isr_common_stub
 %endmacro
 
@@ -47,6 +47,9 @@ ISR_NOERRCODE 28
 ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
+
+; system call interrupt
+ISR_NOERRCODE 186
 
 isr_common_stub:
 ; save edi, esi, ebp, esp, ebx, edx, ecx, eax

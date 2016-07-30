@@ -13,10 +13,13 @@ void _isr20(); void _isr21(); void _isr22(); void _isr23();
 void _isr24(); void _isr25(); void _isr26(); void _isr27();
 void _isr28(); void _isr29(); void _isr30(); void _isr31();
 
+void _isr186();
+
 void _irq0();  void _irq1();  void _irq2();  void _irq3();
 void _irq4();  void _irq5();  void _irq6();  void _irq7();
 void _irq8();  void _irq9();  void _irq10(); void _irq11();
 void _irq12(); void _irq13(); void _irq14(); void _irq15();
+
 
 void idt_load(u32 idt_ptr);
 void idt_set_gate(u8 n, u32 base, u16 selector, u8 flags);
@@ -104,6 +107,9 @@ void idt_init() {
 	idt_set_gate(45, (u32) _irq13, 0x08, 0x8E);
 	idt_set_gate(46, (u32) _irq14, 0x08, 0x8E);
 	idt_set_gate(47, (u32) _irq15, 0x08, 0x8E);
+
+	// system call interrupt
+	idt_set_gate(0xBA, (u32) _isr186, 0x08, 0x8E);
 
 	idt_load((u32) &idt_ptr);
 }
