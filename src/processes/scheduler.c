@@ -2,18 +2,9 @@
 #include <klibc.h>
 #include <kprintf.h>
 #include <liballoc.h>
-
 #include <system.h>
 
-#define USER_STACK_HIGH 0x00401000
-
-typedef struct process {
-	InterruptSave is;
-	u32 cr3;
-	u32 entry;
-	u8  started;
-	struct process* next;
-} Process;
+#include <scheduler.h>
 
 void scheduler_callback(InterruptSave* is);
 
@@ -35,7 +26,7 @@ void scheduler_init() {
 	out(0x40, (div >> 8));
 }
 
-void scheduler_new_process(u32 entry, u32 cr3) {
+void scheduler_new_process(u32 entry, u32 cr3, u32 image_low, u32 image_high) {
 	Process* process = process_current;
 
 	if (process == NULL) {
@@ -51,10 +42,12 @@ void scheduler_new_process(u32 entry, u32 cr3) {
 		process = process->next;
 	}
 
-	process->cr3     = cr3;
-	process->entry   = entry;
-	process->started = false;
-	process->next    = NULL;
+	process->cr3        = cr3;
+	process->entry      = entry;
+	process->started    = false;
+	process->image_low  = image_low;
+	process->image_high = image_high;
+	process->next       = NULL;
 }
 
 void scheduler_exit_current() {

@@ -4,6 +4,10 @@
 #include <ints.h>
 #include <klibc.h>
 
+// common
+#define USER_STACK_LOW  0x00400000
+#define USER_STACK_HIGH 0x00401000
+
 // memory/gdt.c
 void gdt_init();
 
@@ -51,10 +55,5 @@ void invlpg(u32 address);
 
 // vfs.c
 ssize_t vfs_read(u32 inode_num, void* buf, size_t count, u32 pos);
-
-// processes/scheduler.c
-void scheduler_init();
-void scheduler_new_process(u32 entry, u32 cr3);
-void scheduler_exit_current();
 
 #endif

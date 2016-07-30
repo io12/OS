@@ -4,8 +4,6 @@
 #include <paging.h>
 #include <system.h>
 
-#define USER_STACK_LOW 0x00400000
-
 #define SHT_NOBITS 8
 
 typedef struct {
@@ -55,9 +53,11 @@ u8 elf_verify(ELF32_Header* header);
 
 void elf_exec(void* file) {
 	ELF32_Header* header = file;
-	ELF32_SectionHeader* section_header;
+	ELF32_SectionHeader* sh;
 	PageDirectory* page_dir;
 	PageTableEntry* stack_page;
+	u32 image_low = 0xFFFFFFFF;
+	u32 image_high = 0;
 	u32 i = 0;
 	u32 j = 0;
 
@@ -74,27 +74,33 @@ void elf_exec(void* file) {
 
 	// iterate through the section headers
 	while (i < header->e_shentsize * header->e_shnum) {
-		section_header = (void*) ((u32) header + (header->e_shoff + i));
+		sh = (void*) ((u32) header + (header->e_shoff + i));
 		// check if the section should be loaded at an address
-		if (section_header->sh_addr != 0) {
+		if (sh->sh_addr != 0) {
 			// add section header to page directory
-			while (j < section_header->sh_size) {
+			while (j < sh->sh_size) {
 				paging_frame_alloc(paging_get_page(
-							section_header->sh_addr + j,
+							sh->sh_addr + j,
 							page_dir));
-				invlpg(section_header->sh_addr + j);
+				invlpg(sh->sh_addr + j);
 				j += 0x1000;
 			}
-			if (section_header->sh_type == SHT_NOBITS) {
+			if (sh->sh_type == SHT_NOBITS) {
 				// section is .bss
-				memset((void*) section_header->sh_addr, 0,
-						section_header->sh_size);
+				memset((void*) sh->sh_addr, 0,
+						sh->sh_size);
 			}
 			else {
-				memcpy((void*) section_header->sh_addr, (void*) ((u32)
+				memcpy((void*) sh->sh_addr, (void*) ((u32)
 							header +
-							section_header->sh_offset),
-						section_header->sh_size);
+							sh->sh_offset),
+						sh->sh_size);
+			}
+			if (sh->sh_addr < image_low) {
+				image_low = sh->sh_addr;
+			}
+			if (sh->sh_addr + sh->sh_size > image_high) {
+				image_high = sh->sh_addr + sh->sh_size;
 			}
 		}
 		i += header->e_shentsize;
@@ -106,7 +112,7 @@ void elf_exec(void* file) {
 	stack_page->writable = 1;
 	invlpg(USER_STACK_LOW);
 
-	scheduler_new_process(header->e_entry, (u32) page_dir);
+	scheduler_new_process(header->e_entry, (u32) page_dir, image_low, image_high);
 }
 
 u8 elf_verify(ELF32_Header* header) {
