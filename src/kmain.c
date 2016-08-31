@@ -8,6 +8,7 @@
 #include <liballoc.h>
 #include <multiboot.h>
 #include <paging.h>
+#include <scheduler.h>
 #include <system.h>
 
 void elf_exec(void* file);
@@ -78,7 +79,7 @@ void kmain(u32 mboot_magic, MultibootInfo* mboot_info) {
 	scheduler_init();
 
 	char* elf = malloc(488);
-	vfs_read(ext2_path_to_inode_num(2, "a.out"), elf, 488, 0);
+	ext2_read(ext2_path_to_inode_num(2, "a.out"), elf, 488, 0);
 	elf_exec(elf);
 	free(elf);
 

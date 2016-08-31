@@ -1,46 +1,60 @@
-#include <ext2.h>
 #include <ints.h>
 #include <klibc.h>
+#include <liballoc.h>
 
-// TODO: clean this up
-ssize_t vfs_read(u32 inode_num, void* buf, size_t count, u32 pos) {
-	Ext2Inode* inode = ext2_get_inode(inode_num);
-	u8* block_ptr;
-	u32 block_num;
-	u32 n_into_block;
-	u32 count_in_block;
-	ssize_t ret = 0;
+typedef struct filesystem_node {
+	char* name;
+	void* fs_data;
+	u32 mask;
+	u32 uid;
+	u32 gid;
+	u32 flags;
+	u32 inode;
+	u32 length;
 
-	if (pos > inode->size) {
-		return 0;
+	u32 atime;
+	u32 mtime;
+	u32 ctime;
+
+	struct filesystem_node* symlink;
+	u32 hardlink_count;
+} FilesystemNode;
+
+VFS_MountpointList* vfs_mountpoints = NULL;
+u32 ramdisk_count = 0;
+
+void vfs_mount(const char* path, int fs_type, void* fs_data) {
+	VFS_MountpointList* mountpoint = vfs_mountpoints;
+
+	// allocate a new entry
+	if (mountpoint == NULL) {
+		mountpoint = malloc(sizeof(VFS_MountpointList));
+		vfs_mountpoints = mountpoint;
 	}
-	if (pos + count > inode->size) {
-		count = inode->size - pos;
-	}
-
-	block_num    = ext2_inode_get_block(inode, pos / ext2_block_size);
-	block_ptr    = ext2_block_to_ptr(block_num);
-	n_into_block = pos % ext2_block_size;
-	block_ptr   += n_into_block;
-
-	for (;;) {
-		count_in_block = ext2_block_size - n_into_block;
-		if (count_in_block >= count) {
-			memcpy(buf + ret, block_ptr, count);
-			ret += count;
-			break;
+	else {
+		while (mountpoint->next != NULL) {
+			mountpoint = mountpoint->next;
 		}
-		else {
-			memcpy(buf + ret, block_ptr, count_in_block);
-			ret         += count_in_block;
-			pos         += count_in_block;
-			block_num    = ext2_inode_get_block(inode,
-					pos / ext2_block_size);
-			block_ptr    = ext2_block_to_ptr(block_num);
-			count       -= count_in_block;
-			n_into_block = 0;
-		}
+		mountpoint->next = malloc(sizeof(VFS_MountpointList));
+		mountpoint = mountpoint->next;
 	}
 
-	return ret;
+	mountpoint->path    = strdup(path);
+	mountpoint->fs_type = fs_type;
+	mountpoint->fs_data = fs_data;
+	mountpoint->next    = NULL;
+}
+
+void vfs_ramdisk_attach(void* ptr) {
+	char* path[64];
+
+	sprintf(path, "/dev/ram%u", ramdisk_count);
+	ramdisk_count++;
+
+	vfs_mount(path, FS_TYPE_EXT2_DEV_RAMDISK, ptr);
+}
+
+void vfs_ramdisk_mount(void)
+
+VFS_File* vfs_open() {
 }

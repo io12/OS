@@ -1,6 +1,8 @@
 #ifndef _SCHEDULER_H_
 #define _SCHEDULER_H_
 
+#include <interrupt_handler.h>
+
 typedef struct process {
 	InterruptSave is;
 	u32 cr3;

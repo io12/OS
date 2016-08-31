@@ -53,7 +53,4 @@ u32 cr3_read();
 void cr3_write(u32 cr3);
 void invlpg(u32 address);
 
-// vfs.c
-ssize_t vfs_read(u32 inode_num, void* buf, size_t count, u32 pos);
-
 #endif

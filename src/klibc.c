@@ -1,6 +1,69 @@
 #include <ints.h>
+#include <liballoc.h>
 
 #include <klibc.h>
+
+// stdio.h
+
+int sprintf(char* buf, const char* fmt, ...) {
+	va_list ap;
+	int ret;
+
+	va_start(ap, fmt);
+	ret = vsprintf(buf, fmt, ap);
+	va_end(ap);
+
+	return ret;
+}
+
+int vsprintf(char* buf, const char* fmt, va_list ap) {
+	char* str;
+	int ret;
+
+	for (; *fmt != '\0'; fmt++) {
+		if (*fmt != '%') {
+			*buf = *fmt;
+			buf++;
+			continue;
+		}
+		fmt++;
+		switch (*fmt) {
+			case 's':
+				str = va_arg(ap, char*);
+				if (str == NULL) {
+					str = "(null)"
+				}
+				else {
+					strcpy(buf, str);
+					buf += strlen(str);
+				}
+				break;
+			case 'c':
+				*buf = va_arg(ap, int);
+				buf++;
+				break;
+			case 'u':
+				buf += udec_to_str(buf, va_arg(ap, int));
+				break;
+			case 'X':
+				buf += uhex_to_str(buf, va_arg(ap, int));
+				break;
+			case '%':
+				*buf = '%';
+				buf++;
+				break;
+			case '\0':
+				return;
+			default:
+				*buf = *fmt;
+				buf++;
+		}
+	}
+
+	return ret;
+}
+
+// string.h
 
 int memcmp(const void* p1, const void* p2, size_t n) {
 	size_t i;
@@ -68,6 +131,14 @@ int strcmp(const char* s1, const char* s2) {
 	}
 
 	return 0;
+}
+
+char* strcpy(char* dest, const char* src) {
+	return memcpy(dest, src, strlen(src) + 1);
+}
+
+char* strdup(const char* str) {
+	return strcpy(malloc(strlen(str) + 1), str);
 }
 
 size_t strlen(const char* str) {

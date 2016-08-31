@@ -28,7 +28,7 @@
 
 char hex_digits[] = "0123456789ABCDEF";
 
-void udec_to_str(char* buf, u32 num) {
+u32 udec_to_str(char* buf, u32 num) {
 	char backwards_buf[DEC_BUF_SIZE] = {'\0'};
 	i16 i = 0;
 	i16 j = 0;
@@ -53,9 +53,11 @@ void udec_to_str(char* buf, u32 num) {
 		}
 	}
 	buf[j] = '\0';
+
+	return j;
 }
 
-void uhex_to_str(char* buf, u32 num) {
+u32 uhex_to_str(char* buf, u32 num) {
 	char backwards_buf[HEX_BUF_SIZE] = {'\0'};
 	i16 i = 0;
 	i16 j = 0;
@@ -81,6 +83,8 @@ void uhex_to_str(char* buf, u32 num) {
 		}
 	}
 	buf[j] = '\0';
+
+	return j;
 }
 
 void kprint_udec(PrintLocation pl, u32 num) {

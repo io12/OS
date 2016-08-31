@@ -27,15 +27,13 @@ typedef struct {
 
 	u8  os_specific_val_2[12];
 } __attribute__((packed))
-Ext2Inode;
+Ext2_Inode;
 
-void* ext2_block_to_ptr(u32 block);
-u32 ext2_find_file(const Ext2Inode* inode, const char* fname);
-Ext2Inode* ext2_get_inode(u32 inode_num);
-void ext2_init(u32 ramdisk_address);
-u32 ext2_inode_get_block(const Ext2Inode* inode, u32 block);
-u32 ext2_path_to_inode_num(u32 inode_num, char* fpath);
-
-extern u32 ext2_block_size;
+void* ext2_block_to_ptr(void* fs, u32 block);
+u32 ext2_find_file(void* fs, const Ext2_Inode* inode, const char* fname);
+Ext2_Inode* ext2_get_inode(void* fs, u32 inode_num);
+void ext2_init(void* fs, u32 ramdisk_address);
+u32 ext2_inode_get_block(void* fs, const Ext2_Inode* inode, u32 block);
+u32 ext2_path_to_inode_num(void* fs, u32 inode_num, char* fpath);
 
 #endif

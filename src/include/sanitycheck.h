@@ -23,7 +23,7 @@
 #error "Must be compiled as 32 bit"
 #endif
 
-#ifdef __linux__
+#if defined(__unix__) || defined(__MACH__) || defined(_WIN32)
 #warning "You are not using a cross compiler"
 #endif
 

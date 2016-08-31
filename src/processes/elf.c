@@ -2,6 +2,7 @@
 #include <klibc.h>
 #include <kprintf.h>
 #include <paging.h>
+#include <scheduler.h>
 #include <system.h>
 
 #define SHT_NOBITS 8
