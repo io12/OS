@@ -9,6 +9,12 @@ typedef unsigned int size_t;
 #define true  1
 #define false 0
 
+// stdarg.h
+#define va_start(ap, last) __builtin_va_start(ap, last)
+#define va_arg(ap, type) __builtin_va_arg(ap, type)
+#define va_end(ap) __builtin_va_end(ap)
+typedef __builtin_va_list va_list;
+
 // string.h
 int memcmp(const void* p1, const void* p2, size_t n);
 void* memcpy(void* dest, const void* src, size_t n);

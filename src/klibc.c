@@ -31,7 +31,7 @@ int vsprintf(char* buf, const char* fmt, va_list ap) {
 			case 's':
 				str = va_arg(ap, char*);
 				if (str == NULL) {
-					str = "(null)"
+					str = "(null)";
 				}
 				else {
 					strcpy(buf, str);
